@@ -89,13 +89,11 @@ if child_name:
         document.add_paragraph("Therapist Notes:")
         document.add_paragraph(notes)
 
-    document.add_paragraph("
-⚠️ Items flagged for review:")
+    document.add_paragraph("⚠️ Items flagged for review:")
     for item in flagged_items:
         document.add_paragraph(f"- {item}")
 
-    document.add_paragraph("
-Scoring Summary:")
+    document.add_paragraph("Scoring Summary:")
     for item, score in scores.items():
         document.add_paragraph(f"{item}: {score}")
 
