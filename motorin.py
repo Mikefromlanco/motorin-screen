@@ -1,115 +1,161 @@
 import streamlit as st
 from io import BytesIO
-import base64
+from docx import Document
+from fpdf import FPDF
 
-# Try importing docx safely
-try:
-    from docx import Document
-    docx_available = True
-except ImportError:
-    docx_available = False
+# Configuration
+st.set_page_config(page_title="MOTORIN Screener", layout="wide")
+st.title("🧠 MOTORIN Fine Motor Screener")
+st.subheader("OT-led Screener: Caregiver Interview and/or Child Participation")
 
-# Score map for radio buttons
-score_map = {
-    "Absent (0 points)": 0,
-    "Emerging (1 point)": 1,
-    "Present (2 points)": 2
+# Scoring categories
+options = ["Absent (0)", "Emerging (1)", "Present (2)"]
+score_map = {"Absent (0)": 0, "Emerging (1)": 1, "Present (2)": 2}
+
+# Screener data
+motorin_data = {
+    "6–12 Months": {
+        "color": "#add8e6",
+        "items": [
+            "Reaches with both hands",
+            "Transfers toy hand-to-hand",
+            "Uses whole hand to rake small objects",
+            "Bangs objects together",
+            "Brings hands to midline",
+            "Scribbles spontaneously when given a crayon",
+            "Fisted grasp when holding a crayon"
+        ]
+    },
+    "12–18 Months": {
+        "color": "#ffa07a",
+        "items": [
+            "Points with index finger",
+            "Releases small object into container voluntarily",
+            "Stacks 2-3 blocks",
+            "Turns pages in a cardboard book",
+            "Uses a spoon with spills",
+            "Pulls lids off containers (e.g., Play-Doh, Tupperware)",
+            "Digital pronate grasp when coloring"
+        ]
+    },
+    "18–24 Months": {
+        "color": "#add8e6",
+        "items": [
+            "Imitates vertical stroke with crayon",
+            "Places small objects into a container",
+            "Builds a 4-block tower",
+            "Opens Ziplock bags"
+        ]
+    },
+    "24–30 Months": {
+        "color": "#ffa07a",
+        "items": [
+            "Imitates horizontal stroke",
+            "Turns single pages in board books",
+            "Unscrews lids from containers",
+            "Snips with child-safe scissors",
+            "Scribbles within large shapes without crossing boundaries",
+            "Attempts to copy a circle",
+            "Uses fingertip grasp when coloring"
+        ]
+    },
+    "30–36 Months": {
+        "color": "#add8e6",
+        "items": [
+            "Copies circle independently",
+            "Begins to draw a person with head and limbs (2-4 parts)",
+            "Builds 6-8 block tower",
+            "Uses spoon and fork with moderate spill",
+            "Tripod grasp emerges when coloring"
+        ]
+    },
+    "3–4 Years": {
+        "color": "#ffa07a",
+        "items": [
+            "Copies cross",
+            "Cuts across a piece of paper with scissors",
+            "Strings large beads",
+            "Buttons large buttons",
+            "Begins drawing a square"
+        ]
+    },
+    "4–5 Years": {
+        "color": "#add8e6",
+        "items": [
+            "Copies square",
+            "Begins drawing triangle",
+            "Cuts on a line with scissors",
+            "Writes some letters in their name",
+            "Dresses self with supervision (zippers/buttons)"
+        ]
+    },
+    "5–6 Years": {
+        "color": "#ffa07a",
+        "items": [
+            "Copies triangle",
+            "Begins copying diamond",
+            "Draws person with 6+ parts",
+            "Prints first and last name",
+            "Ties shoelaces (attempts)",
+            "Buttons and unbuttons without help"
+        ]
+    },
+    "6–7 Years": {
+        "color": "#add8e6",
+        "items": [
+            "Copies diamond",
+            "Writes legibly within lines",
+            "Cuts out complex shapes accurately",
+            "Ties shoelaces independently",
+            "Demonstrates refined tripod grasp"
+        ]
+    }
 }
 
-# Screener items grouped by developmental domain
-screener_items = {
-    "Prewriting & Drawing": [
-        "Scribbles or Draws",
-        "Pencil Grasp"
-    ],
-    "Tool Use": [
-        "Uses Spoon/Fork",
-        "Snips with Scissors",
-        "Cuts Playdough or Putty"
-    ],
-    "Manipulation": [
-        "Strings Beads",
-        "Turns Lid or Cap",
-        "Fastens Zipper",
-        "Isolates Finger to Point or Tap"
-    ],
-    "Construction": [
-        "Stacks Blocks"
-    ]
-}
+scores = {}
 
-# Streamlit app UI
-st.set_page_config(page_title="Motorin Screener", layout="centered")
-st.title("Motorin Fine Motor Screener")
-st.markdown("Use this tool to screen fine motor development in children ages 1–7.")
+# UI for scoring
+for age_group, data in motorin_data.items():
+    st.markdown(f"### <span style='color:{data['color']}'>{age_group}</span>", unsafe_allow_html=True)
+    for item in data['items']:
+        choice = st.radio(item, options, horizontal=True, key=f"{age_group}_{item}")
+        scores[f"{age_group}: {item}"] = score_map[choice]
 
-st.header("Screener Items")
-user_scores = {}
+# Generate report
+if st.button("Generate Report"):
+    total_score = sum(scores.values())
+    doc = Document()
+    doc.add_heading("MOTORIN Screener Report", 0)
+    doc.add_paragraph(f"Total Score: {total_score}")
 
-# Render radio buttons for each item
-for domain, items in screener_items.items():
-    st.subheader(domain)
-    for item in items:
-        choice = st.radio(
-            label=item,
-            options=["Absent (0 points)", "Emerging (1 point)", "Present (2 points)"],
-            index=None,
-            key=item
-        )
-        if choice:
-            user_scores[item] = score_map[choice]
+    for age_group in motorin_data:
+        doc.add_heading(age_group, level=1)
+        for item in motorin_data[age_group]['items']:
+            key = f"{age_group}: {item}"
+            val = scores[key]
+            doc.add_paragraph(f"{item}: {val} ({[k for k,v in score_map.items() if v == val][0]})")
 
-# Results summary after scoring
-if user_scores:
-    total = sum(user_scores.values())
-    max_score = len(user_scores) * 2
-    percent = (total / max_score) * 100
+    # Save as Word
+    word_stream = BytesIO()
+    doc.save(word_stream)
+    st.download_button("Download Word Report", word_stream.getvalue(), file_name="motorin_report.docx")
 
-    # Interpretation
-    if percent < 50:
-        result = "Needs further assessment"
-    elif percent < 75:
-        result = "May need further assessment"
-    else:
-        result = "Fine motor skills appear age-appropriate"
+    # Save as PDF
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
+    pdf.multi_cell(0, 10, txt="MOTORIN Screener Report\n\n")
+    pdf.multi_cell(0, 10, txt=f"Total Score: {total_score}\n")
+    for age_group in motorin_data:
+        pdf.set_font("Arial", style='B', size=12)
+        pdf.cell(0, 10, txt=age_group, ln=True)
+        pdf.set_font("Arial", size=12)
+        for item in motorin_data[age_group]['items']:
+            key = f"{age_group}: {item}"
+            val = scores[key]
+            label = [k for k,v in score_map.items() if v == val][0]
+            pdf.multi_cell(0, 10, txt=f"{item}: {val} ({label})")
 
-    # Display results
-    st.markdown("## Results")
-    st.markdown(f"**Total Score:** {total} / {max_score} ({percent:.1f}%)")
-    st.markdown(f"**Interpretation:** {result}")
-
-    # Summary paragraph
-    summary = (
-        f"The Motorin screener was completed to assess fine motor abilities across several developmental areas. "
-        f"The child earned {total} out of {max_score} possible points ({percent:.1f}%), which falls into the category: "
-        f"**{result}**. Additional assessment may be warranted depending on clinical judgment or developmental concerns."
-    )
-
-    st.markdown("## Summary")
-    st.write(summary)
-
-    # Word report generation if python-docx is installed
-    if docx_available:
-        def create_word_doc(summary, scores):
-            doc = Document()
-            doc.add_heading("Motorin Screener Report", 0)
-            doc.add_paragraph(summary)
-            doc.add_heading("Item Scores", level=1)
-            for item, score in scores.items():
-                doc.add_paragraph(f"{item}: {score} point(s)")
-            buffer = BytesIO()
-            doc.save(buffer)
-            return buffer.getvalue()
-
-        word_bytes = create_word_doc(summary, user_scores)
-        b64 = base64.b64encode(word_bytes).decode()
-        href = f'<a href="data:application/octet-stream;base64,{b64}" download="motorin_screener_report.docx">📄 Download Word Report</a>'
-        st.markdown(href, unsafe_allow_html=True)
-    else:
-        st.warning("To enable Word report download, please install `python-docx`.")
-
-    # PDF placeholder
-    st.markdown("*PDF export coming soon.*")
-
-else:
-    st.info("Please score at least one item to see results and generate a report.")
+    pdf_stream = BytesIO()
+    pdf.output(pdf_stream)
+    st.download_button("Download PDF Report", pdf_stream.getvalue(), file_name="motorin_report.pdf")
