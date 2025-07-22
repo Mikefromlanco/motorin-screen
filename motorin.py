@@ -8,9 +8,12 @@ from datetime import date
 st.set_page_config(page_title="MOTORIN Screener", layout="wide")
 st.title("🧠 MOTORIN Fine Motor Screener")
 
-# Child info
+# Child and therapist info
 child_name = st.text_input("Child's Name", placeholder="Enter name or initials")
 dob = st.date_input("Child's Date of Birth")
+therapist_name = st.text_input("Therapist Name", placeholder="Enter therapist name")
+session_date = st.date_input("Session Date", value=date.today())
+notes = st.text_area("Therapist Notes / Impressions")
 
 # Calculate age
 today = date.today()
@@ -76,41 +79,58 @@ for age_group, data in motorin_data.items():
 # Report
 if st.button("Generate Report"):
     total_score = sum(scores.values())
+
+    # Word report
     doc = Document()
     doc.add_heading("MOTORIN Screener Report", 0)
     doc.add_paragraph(f"Name: {child_name}")
+    doc.add_paragraph(f"Therapist: {therapist_name}")
+    doc.add_paragraph(f"Session Date: {session_date.strftime('%B %d, %Y')}")
     if age_years is not None:
         doc.add_paragraph(f"Chronological Age: {age_years} years, {age_months} months")
     doc.add_paragraph(f"Total Score: {total_score}")
+
     if flagged_items:
-        doc.add_paragraph("\n⚠️ Items flagged for review:")
+        doc.add_heading("⚠️ Flagged Items (Marked Absent)", level=2)
         for flag in flagged_items:
             doc.add_paragraph(f"- {flag}")
 
     for age_group in motorin_data:
-        doc.add_heading(age_group, level=1)
+        doc.add_heading(age_group, level=2)
         for item in motorin_data[age_group]['items']:
             key = f"{age_group}: {item}"
             val = scores[key]
-            doc.add_paragraph(f"{item}: {val} ({[k for k,v in score_map.items() if v == val][0]})")
+            label = [k for k, v in score_map.items() if v == val][0]
+            doc.add_paragraph(f"{item}: {label}")
+
+    if notes:
+        doc.add_heading("Therapist Notes", level=2)
+        doc.add_paragraph(notes)
 
     word_stream = BytesIO()
     doc.save(word_stream)
     st.download_button("Download Word Report", word_stream.getvalue(), file_name="motorin_report.docx")
 
+    # PDF report
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", size=12)
-    pdf.multi_cell(0, 10, txt="MOTORIN Screener Report\n\n")
+    pdf.multi_cell(0, 10, txt="MOTORIN Screener Report")
     pdf.multi_cell(0, 10, txt=f"Name: {child_name}")
+    pdf.multi_cell(0, 10, txt=f"Therapist: {therapist_name}")
+    pdf.multi_cell(0, 10, txt=f"Session Date: {session_date.strftime('%B %d, %Y')}")
     if age_years is not None:
         pdf.multi_cell(0, 10, txt=f"Chronological Age: {age_years} years, {age_months} months")
     pdf.multi_cell(0, 10, txt=f"Total Score: {total_score}\n")
+
     if flagged_items:
-        pdf.multi_cell(0, 10, txt="\nItems flagged for review:")
+        pdf.set_font("Arial", style='B', size=12)
+        pdf.multi_cell(0, 10, txt="Flagged Items (Marked Absent):")
+        pdf.set_font("Arial", size=12)
         for flag in flagged_items:
             clean_flag = flag.encode('latin-1', 'replace').decode('latin-1')
             pdf.multi_cell(0, 10, txt=f"- {clean_flag}")
+
     for age_group in motorin_data:
         pdf.set_font("Arial", style='B', size=12)
         pdf.cell(0, 10, txt=age_group.encode('latin-1', 'replace').decode('latin-1'), ln=True)
@@ -118,10 +138,17 @@ if st.button("Generate Report"):
         for item in motorin_data[age_group]['items']:
             key = f"{age_group}: {item}"
             val = scores[key]
-            label = [k for k,v in score_map.items() if v == val][0]
+            label = [k for k, v in score_map.items() if v == val][0]
             clean_item = item.encode('latin-1', 'replace').decode('latin-1')
-            pdf.multi_cell(0, 10, txt=f"{clean_item}: {val} ({label})")
+            pdf.multi_cell(0, 10, txt=f"{clean_item}: {label}")
+
+    if notes:
+        pdf.set_font("Arial", style='B', size=12)
+        pdf.multi_cell(0, 10, txt="\nTherapist Notes")
+        pdf.set_font("Arial", size=12)
+        pdf.multi_cell(0, 10, txt=notes.encode('latin-1', 'replace').decode('latin-1'))
 
     pdf_stream = BytesIO()
-    pdf.output(pdf_stream)
+    pdf_bytes = pdf.output(dest='S').encode('latin-1')
+    pdf_stream.write(pdf_bytes)
     st.download_button("Download PDF Report", pdf_stream.getvalue(), file_name="motorin_report.pdf")
