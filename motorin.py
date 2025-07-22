@@ -24,6 +24,7 @@ if dob:
     age_years = age.years
     age_months = age.months
     st.markdown(f"**Chronological Age:** {age_years} years, {age_months} months")
+st.markdown(f"**Date of Birth (entered):** {dob.strftime('%d/%m/%Y')}")
 
 
 
@@ -81,7 +82,7 @@ if child_name:
     document.add_paragraph(f"Name: {child_name}")
     document.add_paragraph(f"Session Date: {session_date.strftime('%B %d, %Y')}")
     if dob:
-        document.add_paragraph(f"Date of Birth: {dob.strftime('%B %d, %Y')}")
+        document.add_paragraph(f"Date of Birth: {dob.strftime('%d/%m/%Y')}")
         document.add_paragraph(f"Chronological Age: {age_years} years, {age_months} months")
     if therapist_name:
         document.add_paragraph(f"Therapist: {therapist_name}")
