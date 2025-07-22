@@ -1,111 +1,105 @@
-**MOTORIN Screener Item List (Draft)**  
-*For use by Occupational Therapists via caregiver interview and/or direct child participation*
+import streamlit as st
+from io import BytesIO
+from docx import Document
+import base64
 
----
+# --- Score values ---
+score_map = {
+    "Absent (0 points)": 0,
+    "Emerging (1 point)": 1,
+    "Present (2 points)": 2
+}
 
-### Age 6-12 Months *(light blue)*
+# --- Screener Items Organized by Subdomain ---
+screener_items = {
+    "Prewriting & Drawing": [
+        "Scribbles or Draws",
+        "Pencil Grasp"
+    ],
+    "Tool Use": [
+        "Uses Spoon/Fork",
+        "Snips with Scissors",
+        "Cuts Playdough or Putty"
+    ],
+    "Manipulation": [
+        "Strings Beads",
+        "Turns Lid or Cap",
+        "Fastens Zipper",
+        "Isolates Finger to Point or Tap"
+    ],
+    "Construction": [
+        "Stacks Blocks"
+    ]
+}
 
-- Reaches with both hands
-- Transfers toy hand-to-hand
-- Uses whole hand to rake small objects
-- Bangs objects together
-- Brings hands to midline
-- Scribbles spontaneously when given a crayon *(scribble begins here)*
-- Fisted grasp when holding a crayon *(add image: fisted grasp)*
+# --- App Header ---
+st.title("Motorin Fine Motor Screener")
+st.markdown("Screening tool for fine motor development in children ages 1–7.")
 
-### Age 12-18 Months *(orange)*
+# --- Scoring Form ---
+st.header("Screener Items")
+user_scores = {}
 
-- Points with index finger
-- Releases small object into container voluntarily
-- Stacks 2-3 blocks
-- Turns pages in a cardboard book
-- Uses a spoon with spills
-- Pulls lids off containers (e.g., Play-Doh, Tupperware)
-- Digital pronate grasp when coloring *(add image: digital pronate grasp)*
+for domain, items in screener_items.items():
+    st.subheader(domain)
+    for item in items:
+        response = st.radio(
+            label=item,
+            options=["Absent (0 points)", "Emerging (1 point)", "Present (2 points)"],
+            index=None,
+            key=item
+        )
+        if response:
+            user_scores[item] = score_map[response]
 
-### Age 18-24 Months *(light blue)*
+# --- Results ---
+if user_scores:
+    total_score = sum(user_scores.values())
+    max_score = len(user_scores) * 2
+    percent = (total_score / max_score) * 100
 
-- Imitates vertical stroke with crayon *(pre-writing begins here)*
-- Places small objects into a container
-- Builds a 4-block tower
-- Opens Ziplock bags
+    # --- Interpretation ---
+    if percent < 50:
+        interpretation = "Needs further assessment"
+    elif percent < 75:
+        interpretation = "May need further assessment"
+    else:
+        interpretation = "Fine motor skills appear age-appropriate"
 
-### Age 24-30 Months *(orange)*
+    st.markdown("## Results")
+    st.markdown(f"**Total Score:** {total_score} / {max_score} ({percent:.1f}%)")
+    st.markdown(f"**Interpretation:** {interpretation}")
 
-- Imitates horizontal stroke
-- Turns single pages in board books
-- Unscrews lids from containers
-- Snips with child-safe scissors
-- Scribbles within large shapes without crossing boundaries
-- Attempts to copy a circle
-- Uses fingertip grasp when coloring *(add image: fingertip grasp)*
+    # --- Summary Text ---
+    summary_text = (
+        f"The Motorin screener was used to assess fine motor abilities across domains such as prewriting, tool use, manipulation, and construction. "
+        f"The child earned {total_score} out of {max_score} possible points, or {percent:.1f}%. "
+        f"This performance falls into the category: **{interpretation}**. "
+        f"Consider further evaluation if there are additional developmental concerns."
+    )
 
-### Age 30-36 Months *(light blue)*
+    st.markdown("## Summary")
+    st.write(summary_text)
 
-- Copies circle independently
-- Begins to draw a person with head and limbs (2-4 parts)
-- Builds 6-8 block tower
-- Uses spoon and fork with moderate spill
-- Tripod grasp emerges when coloring *(add image: tripod grasp)*
+    # --- Generate Word Report ---
+    def generate_word_doc(summary, scores):
+        doc = Document()
+        doc.add_heading("Motorin Fine Motor Screener Report", 0)
+        doc.add_paragraph(summary)
+        doc.add_heading("Item Scores", level=1)
+        for item, val in scores.items():
+            doc.add_paragraph(f"{item}: {val} point(s)")
+        byte_stream = BytesIO()
+        doc.save(byte_stream)
+        return byte_stream.getvalue()
 
-### Age 3-4 Years *(orange)*
+    word_file = generate_word_doc(summary_text, user_scores)
+    b64 = base64.b64encode(word_file).decode()
+    download_link = f'<a href="data:application/octet-stream;base64,{b64}" download="motorin_screener_report.docx">📄 Download Word Report</a>'
+    st.markdown(download_link, unsafe_allow_html=True)
 
-- Copies cross
-- Cuts across a piece of paper with scissors
-- Strings large beads
-- Buttons large buttons
-- Begins drawing a square
+    # --- PDF Placeholder ---
+    st.markdown("*PDF export coming soon*")
 
-### Age 4-5 Years *(light blue)*
-
-- Copies square
-- Begins drawing triangle
-- Cuts on a line with scissors
-- Writes some letters in their name
-- Dresses self with supervision (zippers/buttons)
-
-### Age 5-6 Years *(orange)*
-
-- Copies triangle
-- Begins copying diamond
-- Draws person with 6+ parts
-- Prints first and last name
-- Ties shoelaces (attempts)
-- Buttons and unbuttons without help
-
-### Age 6-7 Years *(light blue)*
-
-- Copies diamond
-- Writes legibly within lines
-- Cuts out complex shapes accurately
-- Ties shoelaces independently
-- Demonstrates refined tripod grasp
-
----
-
-### Scoring System
-
-Each item will be scored using the following categories with clickable dots:
-
-- ● Absent = 0 points
-- ● Emerging = 1 point
-- ● Present = 2 points
-
-Each item will be associated with a radio button group that lets the user select one of these three options. Scores will be totaled:
-
-- Per item
-- Per age band
-- Overall total
-
-A written summary report will be auto-generated, incorporating:
-- Item-level scores
-- Age-band performance highlights
-- Flags for any "absent" items significantly below expected age
-- Clinical impressions
-- Recommendations
-
-Users will have the ability to **download results as a PDF or Word document**.
-
----
-
-Next step: generate the Streamlit Python code to match this structure with interactive UI and report generation.
+else:
+    st.info("Please complete the screener to view results and generate a report.")
