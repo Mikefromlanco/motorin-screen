@@ -78,6 +78,27 @@ flagged_items = []
 for idx, (age_group, item) in enumerate(all_items_flat):
     data = motorin_data[age_group]
     auto_present = idx < basal_index
-    st.markdown(f"""
-        <div style='background-color:{data['color']}; padding: 10px; border-radius: 6px;'>
-    """, unsaf
+
+    st.markdown(
+        f"<div style='background-color:{data['color']}; padding: 10px; border-radius: 6px;'>",
+        unsafe_allow_html=True
+    )
+
+    if item == motorin_data[age_group]['items'][0]:
+        st.markdown(f"<h4 style='color:black'>{age_group}</h4>", unsafe_allow_html=True)
+
+    col1, col2, col3 = st.columns([4, 3, 3])
+    with col1:
+        st.markdown(f"<span style='color:black'>{item}</span>", unsafe_allow_html=True)
+    with col2:
+        if auto_present:
+            response = "Present (2)"
+            st.radio("", options, index=2, key=f"{age_group}_{item}", horizontal=True, label_visibility="collapsed", disabled=True)
+        else:
+            response = st.radio("", options, key=f"{age_group}_{item}", horizontal=True, label_visibility="collapsed")
+
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    scores[f"{age_group}: {item}"] = score_map[response]
+    if score_map[response] == 0:
+        flagged_items.append(f"{item} ({age_group})")
