@@ -19,8 +19,10 @@ notes = st.text_area("Therapist Notes / Impressions")
 age_years = age_months = None
 if dob:
     today = date.today()
-    age_years = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
-    age_months = (today.month - dob.month - (today.day < dob.day)) % 12
+    delta = today - dob
+    age_in_days = delta.days
+    age_years = age_in_days // 365
+    age_months = (age_in_days % 365) // 30
     st.markdown(f"**Chronological Age:** {age_years} years, {age_months} months")
 
 # Scoring
@@ -70,10 +72,11 @@ for group_idx, (age_group, data) in enumerate(motorin_data.items()):
             "item": item
         })
 
-# Show items and implement basal logic purely for skipping earlier inputs
+# Show items and implement basal logic
 scores = {}
 flagged_items = []
 present_streak = 0
+basal_triggered = False
 basal_index = None
 
 for idx, entry in enumerate(flat_items):
@@ -91,18 +94,21 @@ for idx, entry in enumerate(flat_items):
         st.markdown(f"<span style='color:black'>{item}</span>", unsafe_allow_html=True)
 
     with col2:
-        if basal_index is not None and idx < basal_index:
-            score = 2
-            st.markdown(f"<span style='color:red'><b>✓ Present (Auto-filled)</b></span>", unsafe_allow_html=True)
+        if basal_triggered and idx < basal_index:
+            default_index = 2  # default to "Present (2)"
         else:
-            response = st.radio("", options, key=key, horizontal=True, label_visibility="collapsed")
-            score = score_map[response]
-            if score == 2:
-                present_streak += 1
-                if present_streak >= 4 and basal_index is None:
-                    basal_index = idx - 3
-            else:
-                present_streak = 0
+            default_index = None
+
+        response = st.radio("", options, key=key, horizontal=True, index=default_index, label_visibility="collapsed")
+        score = score_map[response]
+
+        if score == 2:
+            present_streak += 1
+            if present_streak >= 4 and not basal_triggered:
+                basal_index = idx - 3
+                basal_triggered = True
+        else:
+            present_streak = 0
 
     scores[f"{age_group}: {item}"] = score
     if score == 0:
