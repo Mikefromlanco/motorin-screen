@@ -43,4 +43,25 @@ st.markdown("""
         margin-bottom: 35px;
     }
     hr {
-        margin-t
+        margin-top: 50px;
+        margin-bottom: 50px;
+        border: 1px solid #ccc;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# Display numbered items with improved spacing and dividers
+item_num = 1
+for idx, (age_group, items) in enumerate(screener_items.items()):
+    if idx > 0:
+        st.markdown("<hr>", unsafe_allow_html=True)
+    st.header(age_group)
+    for item in items:
+        st.markdown(f"<div class='item-block'><strong>{item_num}. {item}</strong></div>", unsafe_allow_html=True)
+        st.radio(
+            label="",
+            options=["Absent (0)", "Emerging (1)", "Present (2)"],
+            key=f"{item_num}_{item}",
+            horizontal=True
+        )
+        item_num += 1
