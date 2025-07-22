@@ -11,22 +11,21 @@ st.title("🧠 MOTORIN Fine Motor Screener")
 
 # Child and therapist info
 child_name = st.text_input("Child's Name", placeholder="Enter name or initials")
+
 dob = st.date_input("Child's Date of Birth")
-if dob:
-    dob_display = dob.strftime("%m/%d/%Y")
-    st.markdown(f"*DOB Entered:* {dob_display}")
 therapist_name = st.text_input("Therapist Name", placeholder="Enter therapist name")
 session_date = st.date_input("Session Date", value=date.today())
 notes = st.text_area("Therapist Notes / Impressions")
 
-# Calculate age
-age_years = age_months = None
+# Calculate and display chronological age
 if dob:
     today = date.today()
     age = relativedelta(today, dob)
     age_years = age.years
     age_months = age.months
-    st.markdown(f"**Chronological Age:** {age_years} years, {age_months} months**")
+    st.markdown(f"**Chronological Age:** {age_years} years, {age_months} months")
+
+
 
 # Scoring
 options = ["Absent (0)", "Emerging (1)", "Present (2)"]
@@ -74,6 +73,37 @@ for group_idx, (age_group, data) in enumerate(motorin_data.items()):
             "group_idx": group_idx,
             "item": item
         })
+
+# Generate report
+if child_name:
+    document = Document()
+    document.add_heading("MOTORIN Screener Report", 0)
+    document.add_paragraph(f"Name: {child_name}")
+    document.add_paragraph(f"Session Date: {session_date.strftime('%B %d, %Y')}")
+    if dob:
+        document.add_paragraph(f"Date of Birth: {dob.strftime('%B %d, %Y')}")
+        document.add_paragraph(f"Chronological Age: {age_years} years, {age_months} months")
+    if therapist_name:
+        document.add_paragraph(f"Therapist: {therapist_name}")
+    if notes:
+        document.add_paragraph("Therapist Notes:")
+        document.add_paragraph(notes)
+
+    document.add_paragraph("
+⚠️ Items flagged for review:")
+    for item in flagged_items:
+        document.add_paragraph(f"- {item}")
+
+    document.add_paragraph("
+Scoring Summary:")
+    for item, score in scores.items():
+        document.add_paragraph(f"{item}: {score}")
+
+    buffer = BytesIO()
+    document.save(buffer)
+    buffer.seek(0)
+    st.download_button("📥 Download Report (.docx)", buffer, file_name="motorin_report.docx")
+
 
 # Show items and implement basal logic
 scores = {}
