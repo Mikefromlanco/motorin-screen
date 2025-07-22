@@ -3,6 +3,7 @@ from io import BytesIO
 from docx import Document
 from fpdf import FPDF
 from datetime import date
+from dateutil.relativedelta import relativedelta
 
 # Setup
 st.set_page_config(page_title="MOTORIN Screener", layout="wide")
@@ -19,11 +20,10 @@ notes = st.text_area("Therapist Notes / Impressions")
 age_years = age_months = None
 if dob:
     today = date.today()
-    delta = today - dob
-    age_in_days = delta.days
-    age_years = age_in_days // 365
-    age_months = (age_in_days % 365) // 30
-    st.markdown(f"**Chronological Age:** {age_years} years, {age_months} months")
+    age = relativedelta(today, dob)
+    age_years = age.years
+    age_months = age.months
+    st.markdown(f"**Chronological Age:** {age_years} years, {age_months} months**")
 
 # Scoring
 options = ["Absent (0)", "Emerging (1)", "Present (2)"]
@@ -100,7 +100,7 @@ for idx, entry in enumerate(flat_items):
             default_index = None
 
         response = st.radio("", options, key=key, horizontal=True, index=default_index, label_visibility="collapsed")
-        score = score_map[response]
+        score = score_map.get(response, 0)
 
         if score == 2:
             present_streak += 1
