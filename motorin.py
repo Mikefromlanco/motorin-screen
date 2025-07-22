@@ -16,11 +16,11 @@ session_date = st.date_input("Session Date", value=date.today())
 notes = st.text_area("Therapist Notes / Impressions")
 
 # Calculate age
-today = date.today()
 age_years = age_months = None
 if dob:
+    today = date.today()
     age_years = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
-    age_months = (today.month - dob.month) % 12
+    age_months = (today.month - dob.month - (today.day < dob.day)) % 12
     st.markdown(f"**Chronological Age:** {age_years} years, {age_months} months")
 
 # Scoring
@@ -60,27 +60,28 @@ motorin_data = {
         "Ties shoelaces independently", "Demonstrates refined tripod grasp"]}
 }
 
-# Flatten item list by age group for basal logic
+# Flatten item list
 all_items_flat = []
+age_group_list = list(motorin_data.keys())
 for age_group, group_data in motorin_data.items():
     for item in group_data['items']:
         all_items_flat.append((age_group, item))
 
-# Determine index of basal start (4 items prior to chronological age band)
-age_group_names = list(motorin_data.keys())
-chronological_band_index = min(len(age_group_names) - 1, max(0, (age_years or 0) - 0))
-basal_index = max(0, sum(len(motorin_data[ag]['items']) for ag in age_group_names[:chronological_band_index]) - 4)
+# Identify current age group and basal index
+group_index = min(len(age_group_list) - 1, age_years if age_years is not None else 0)
+age_items_before = sum(len(motorin_data[ag]['items']) for ag in age_group_list[:group_index])
+basal_index = max(0, age_items_before + 4)
 
 scores = {}
 flagged_items = []
 
-# Scoring UI
+# UI Loop
 for idx, (age_group, item) in enumerate(all_items_flat):
-    data = motorin_data[age_group]
+    group_color = motorin_data[age_group]['color']
     auto_present = idx < basal_index
 
     st.markdown(
-        f"<div style='background-color:{data['color']}; padding: 10px; border-radius: 6px;'>",
+        f"<div style='background-color:{group_color}; padding: 10px; border-radius: 6px;'>",
         unsafe_allow_html=True
     )
 
@@ -89,16 +90,10 @@ for idx, (age_group, item) in enumerate(all_items_flat):
 
     col1, col2, col3 = st.columns([4, 3, 3])
     with col1:
-        st.markdown(f"<span style='color:black'>{item}</span>", unsafe_allow_html=True)
+        st.markdown(f"<span style='color:black;'>{item}</span>", unsafe_allow_html=True)
     with col2:
         if auto_present:
             response = "Present (2)"
             st.radio("", options, index=2, key=f"{age_group}_{item}", horizontal=True, label_visibility="collapsed", disabled=True)
         else:
-            response = st.radio("", options, key=f"{age_group}_{item}", horizontal=True, label_visibility="collapsed")
-
-    st.markdown("</div>", unsafe_allow_html=True)
-
-    scores[f"{age_group}: {item}"] = score_map[response]
-    if score_map[response] == 0:
-        flagged_items.append(f"{item} ({age_group})")
+            response = st.radio("", options, k
