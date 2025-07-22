@@ -1,8 +1,9 @@
 import streamlit as st
 
+st.set_page_config(layout="wide")
 st.title("MOTORIN Fine Motor Screener")
 
-# Test items grouped by age
+# Define screener items grouped by age
 screener_items = {
     "6–12 Months": [
         "Reaches with both hands",
@@ -27,8 +28,29 @@ screener_items = {
     ]
 }
 
-# Display items
+# Style radio buttons horizontally
+st.markdown("""
+    <style>
+    .stRadio > div {
+        flex-direction: row;
+    }
+    .stRadio label {
+        margin-right: 20px;
+        font-size: 16px;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# Display numbered items with horizontal radio buttons
+item_num = 1
 for age_group, items in screener_items.items():
     st.header(age_group)
     for item in items:
-        st.radio(f"{item}", ["Absent (0)", "Emerging (1)", "Present (2)"], key=item)
+        st.write(f"**{item_num}. {item}**")
+        st.radio(
+            label="",
+            options=["Absent (0)", "Emerging (1)", "Present (2)"],
+            key=f"{item_num}_{item}",
+            horizontal=True
+        )
+        item_num += 1
