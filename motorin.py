@@ -85,66 +85,10 @@ if child_name:
     document.add_heading("MOTORIN Screener Report", 0)
     document.add_paragraph(f"Name: {child_name}")
     document.add_paragraph(f"Session Date: {session_date.strftime('%B %d, %Y')}")
-document.add_paragraph(f"Date of Birth: {dob.strftime('%d/%m/%Y')}")
-document.add_paragraph(f"Chronological Age: {age_years} years, {age_months} months")
-        if therapist_name:
+    document.add_paragraph(f"Date of Birth: {dob.strftime('%d/%m/%Y')}")
+    document.add_paragraph(f"Chronological Age: {age_years} years, {age_months} months")
+    if therapist_name:
         document.add_paragraph(f"Therapist: {therapist_name}")
     if notes:
         document.add_paragraph("Therapist Notes:")
         document.add_paragraph(notes)
-
-    document.add_paragraph("⚠️ Items flagged for review:")
-    for item in flagged_items:
-        document.add_paragraph(f"- {item}")
-
-    document.add_paragraph("Scoring Summary:")
-    for item, score in scores.items():
-        document.add_paragraph(f"{item}: {score}")
-
-    buffer = BytesIO()
-    document.save(buffer)
-    buffer.seek(0)
-    st.download_button("📥 Download Report (.docx)", buffer, file_name="motorin_report.docx")
-
-
-# Show items and implement basal logic
-scores = {}
-flagged_items = []
-present_streak = 0
-basal_triggered = False
-basal_index = None
-
-for idx, entry in enumerate(flat_items):
-    age_group = entry['age_group']
-    item = entry['item']
-    key = f"{age_group}_{item}"
-
-    show_header = item == motorin_data[age_group]['items'][0]
-    if show_header:
-        st.markdown(f"<hr style='border: 2px solid #ccc;'>", unsafe_allow_html=True)
-        st.markdown(f"<h4 style='color:black'>{age_group}</h4>", unsafe_allow_html=True)
-
-    col1, col2, _ = st.columns([4, 6, 1])
-    with col1:
-        st.markdown(f"<span style='color:black'>{item}</span>", unsafe_allow_html=True)
-
-    with col2:
-        if basal_triggered and idx < basal_index:
-            default_index = 2  # default to "Present (2)"
-        else:
-            default_index = None
-
-        response = st.radio("", options, key=key, horizontal=True, index=default_index, label_visibility="collapsed")
-        score = score_map.get(response, 0)
-
-        if score == 2:
-            present_streak += 1
-            if present_streak >= 4 and not basal_triggered:
-                basal_index = idx - 3
-                basal_triggered = True
-        else:
-            present_streak = 0
-
-    scores[f"{age_group}: {item}"] = score
-    if score == 0:
-        flagged_items.append(f"{item} ({age_group})")
