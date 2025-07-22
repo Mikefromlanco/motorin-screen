@@ -11,7 +11,10 @@ st.title("🧠 MOTORIN Fine Motor Screener")
 
 # Child and therapist info
 child_name = st.text_input("Child's Name", placeholder="Enter name or initials")
-dob = st.date_input("Child's Date of Birth", format="%m/%d/%Y")
+dob = st.date_input("Child's Date of Birth")
+if dob:
+    dob_display = dob.strftime("%m/%d/%Y")
+    st.markdown(f"*DOB Entered:* {dob_display}")
 therapist_name = st.text_input("Therapist Name", placeholder="Enter therapist name")
 session_date = st.date_input("Session Date", value=date.today())
 notes = st.text_area("Therapist Notes / Impressions")
