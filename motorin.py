@@ -12,19 +12,23 @@ st.title("🧠 MOTORIN Fine Motor Screener")
 # Child and therapist info
 child_name = st.text_input("Child's Name", placeholder="Enter name or initials")
 
-dob = st.date_input("Child's Date of Birth (calendar format, DD/MM/YYYY shown below)")
+import datetime
+st.markdown("**Child's Date of Birth**")
+day = st.selectbox("Day", list(range(1, 32)), index=0)
+month = st.selectbox("Month", list(range(1, 13)), index=0)
+year = st.selectbox("Year", list(range(2000, datetime.datetime.now().year + 1)), index=20)
+
+dob = datetime.date(year, month, day)
+age = relativedelta(date.today(), dob)
+age_years = age.years
+age_months = age.months
+st.markdown(f"**Chronological Age:** {age_years} years, {age_months} months")
+
 therapist_name = st.text_input("Therapist Name", placeholder="Enter therapist name")
 session_date = st.date_input("Session Date", value=date.today())
 notes = st.text_area("Therapist Notes / Impressions")
 
-# Calculate and display chronological age
-if dob:
-    today = date.today()
-    age = relativedelta(today, dob)
-    age_years = age.years
-    age_months = age.months
-    st.markdown(f"**Chronological Age:** {age_years} years, {age_months} months")
-st.markdown(f"**Date of Birth (entered):** {dob.strftime('%d/%m/%Y')}")
+
 
 
 
@@ -81,10 +85,9 @@ if child_name:
     document.add_heading("MOTORIN Screener Report", 0)
     document.add_paragraph(f"Name: {child_name}")
     document.add_paragraph(f"Session Date: {session_date.strftime('%B %d, %Y')}")
-    if dob:
-        document.add_paragraph(f"Date of Birth: {dob.strftime('%d/%m/%Y')}")
-        document.add_paragraph(f"Chronological Age: {age_years} years, {age_months} months")
-    if therapist_name:
+document.add_paragraph(f"Date of Birth: {dob.strftime('%d/%m/%Y')}")
+document.add_paragraph(f"Chronological Age: {age_years} years, {age_months} months")
+        if therapist_name:
         document.add_paragraph(f"Therapist: {therapist_name}")
     if notes:
         document.add_paragraph("Therapist Notes:")
