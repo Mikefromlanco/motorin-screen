@@ -12,13 +12,8 @@ st.title("🧠 MOTORIN Fine Motor Screener")
 # Child and therapist info
 child_name = st.text_input("Child's Name", placeholder="Enter name or initials")
 
-import datetime
-st.markdown("**Child's Date of Birth**")
-day = st.selectbox("Day", list(range(1, 32)), index=0)
-month = st.selectbox("Month", list(range(1, 13)), index=0)
-year = st.selectbox("Year", list(range(2000, datetime.datetime.now().year + 1)), index=20)
+dob = st.date_input("Child's Date of Birth", value=date.today()).year + 1)), index=20)
 
-dob = datetime.date(year, month, day)
 age = relativedelta(date.today(), dob)
 age_years = age.years
 age_months = age.months
