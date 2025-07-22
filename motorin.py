@@ -60,40 +60,44 @@ motorin_data = {
         "Ties shoelaces independently", "Demonstrates refined tripod grasp"]}
 }
 
-# Flatten item list
-all_items_flat = []
-age_group_list = list(motorin_data.keys())
-for age_group, group_data in motorin_data.items():
-    for item in group_data['items']:
-        all_items_flat.append((age_group, item))
-
-# Identify current age group and basal index
-group_index = min(len(age_group_list) - 1, age_years if age_years is not None else 0)
-age_items_before = sum(len(motorin_data[ag]['items']) for ag in age_group_list[:group_index])
-basal_index = max(0, age_items_before + 4)
+# Calculate total items up to current age group
+total_items = []
+basal_flag = False
 
 scores = {}
 flagged_items = []
+found_basal = False
+present_streak = 0
 
-# UI Loop
-for idx, (age_group, item) in enumerate(all_items_flat):
-    group_color = motorin_data[age_group]['color']
-    auto_present = idx < basal_index
+for age_group, group_data in motorin_data.items():
+    group_color = group_data['color']
+    st.markdown(f"<div style='background-color:{group_color}; padding: 10px; border-radius: 6px;'>", unsafe_allow_html=True)
+    st.markdown(f"<h4 style='color:black'>{age_group}</h4>", unsafe_allow_html=True)
 
-    st.markdown(
-        f"<div style='background-color:{group_color}; padding: 10px; border-radius: 6px;'>",
-        unsafe_allow_html=True
-    )
+    for item in group_data['items']:
+        col1, col2, _ = st.columns([4, 6, 1])
+        with col1:
+            st.markdown(f"<span style='color:black'>{item}</span>", unsafe_allow_html=True)
 
-    if item == motorin_data[age_group]['items'][0]:
-        st.markdown(f"<h4 style='color:black'>{age_group}</h4>", unsafe_allow_html=True)
+        key = f"{age_group}_{item}"
 
-    col1, col2, col3 = st.columns([4, 3, 3])
-    with col1:
-        st.markdown(f"<span style='color:black;'>{item}</span>", unsafe_allow_html=True)
-    with col2:
-        if auto_present:
-            response = "Present (2)"
-            st.radio("", options, index=2, key=f"{age_group}_{item}", horizontal=True, label_visibility="collapsed", disabled=True)
+        # Automatically assign Present (2) for all items before basal
+        if not found_basal:
+            default_idx = 2  # Present
+            disabled = True
+            present_streak += 1
+            if present_streak >= 4:
+                found_basal = True
         else:
-            response = st.radio("", options, k
+            default_idx = 0
+            disabled = False
+
+        with col2:
+            response = st.radio("", options, index=default_idx, key=key, horizontal=True, label_visibility="collapsed", disabled=disabled)
+
+        score = score_map[response]
+        scores[f"{age_group}: {item}"] = score
+        if score == 0:
+            flagged_items.append(f"{item} ({age_group})")
+
+    st.markdown("</div>", unsafe_allow_html=True)
