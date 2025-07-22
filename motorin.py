@@ -74,6 +74,25 @@ for group_idx, (age_group, data) in enumerate(motorin_data.items()):
             "item": item
         })
 
+# Display items with scoring
+st.markdown("---")
+scores = {}
+flagged_items = []
+
+for item in flat_items:
+    col1, col2 = st.columns([3, 2])
+    with col1:
+        st.markdown(f"**{item['age_group']}** – {item['item']}")
+    with col2:
+        response = st.radio(
+            label="",
+            options=options,
+            key=f"{item['age_group']}_{item['item']}"
+        )
+        scores[item['item']] = score_map[response]
+        if score_map[response] < 2:
+            flagged_items.append(f"{item['item']} ({item['age_group']})")
+
 # Generate report
 if child_name:
     document = Document()
