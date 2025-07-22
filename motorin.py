@@ -3,7 +3,22 @@ import streamlit as st
 st.set_page_config(layout="wide")
 st.title("MOTORIN Fine Motor Screener")
 
-# Define screener items grouped by age range
+# Inject CSS to control spacing and font
+st.markdown("""
+    <style>
+    .stRadio > div {
+        flex-direction: row;
+        gap: 24px !important;
+        margin-top: -8px !important;
+        margin-bottom: -4px !important;
+    }
+    [data-testid="stRadio"] {
+        margin-bottom: 10px !important;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# Define items grouped by age
 screener_items = {
     "6–12 Months": [
         "Reaches with both hands",
@@ -69,38 +84,15 @@ screener_items = {
     ]
 }
 
-# Custom spacing styles
-st.markdown("""
-    <style>
-    .stRadio > div {
-        flex-direction: row;
-        gap: 32px !important;
-        margin-top: -15px;
-    }
-    .stRadio label {
-        font-size: 16px;
-    }
-    .item-block {
-        margin-bottom: 35px;
-    }
-    hr {
-        margin-top: 50px;
-        margin-bottom: 50px;
-        border: 1px solid #ccc;
-    }
-    </style>
-""", unsafe_allow_html=True)
-
-# Display numbered items with horizontal radio buttons
+# Display items in compact format
 item_num = 1
 for idx, (age_group, items) in enumerate(screener_items.items()):
     if idx > 0:
         st.markdown("<hr>", unsafe_allow_html=True)
     st.header(age_group)
     for item in items:
-        st.markdown(f"<div class='item-block'><strong>{item_num}. {item}</strong></div>", unsafe_allow_html=True)
         st.radio(
-            label="",
+            label=f"**{item_num}. {item}**",
             options=["Absent (0)", "Emerging (1)", "Present (2)"],
             key=f"{item_num}_{item}",
             horizontal=True
