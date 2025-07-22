@@ -1,9 +1,13 @@
-# motorin_screener_items.py
+import streamlit as st
 
-motorin_items = [
-    {
-        "age_range": "6-12 Months",
-        "color": "light blue",
+st.set_page_config(page_title="MOTORIN Screener", layout="wide")
+
+st.title("🧠 MOTORIN Fine Motor Screener")
+st.subheader("For Occupational Therapists: Caregiver Interview or Child Participation")
+
+age_brackets = {
+    "6–12 Months": {
+        "color": "#add8e6",
         "items": [
             "Reaches with both hands",
             "Transfers toy hand-to-hand",
@@ -14,9 +18,8 @@ motorin_items = [
             "Fisted grasp when holding a crayon"
         ]
     },
-    {
-        "age_range": "12-18 Months",
-        "color": "orange",
+    "12–18 Months": {
+        "color": "#ffa07a",
         "items": [
             "Points with index finger",
             "Releases small object into container voluntarily",
@@ -27,9 +30,8 @@ motorin_items = [
             "Digital pronate grasp when coloring"
         ]
     },
-    {
-        "age_range": "18-24 Months",
-        "color": "light blue",
+    "18–24 Months": {
+        "color": "#add8e6",
         "items": [
             "Imitates vertical stroke with crayon",
             "Places small objects into a container",
@@ -37,9 +39,8 @@ motorin_items = [
             "Opens Ziplock bags"
         ]
     },
-    {
-        "age_range": "24-30 Months",
-        "color": "orange",
+    "24–30 Months": {
+        "color": "#ffa07a",
         "items": [
             "Imitates horizontal stroke",
             "Turns single pages in board books",
@@ -50,9 +51,8 @@ motorin_items = [
             "Uses fingertip grasp when coloring"
         ]
     },
-    {
-        "age_range": "30-36 Months",
-        "color": "light blue",
+    "30–36 Months": {
+        "color": "#add8e6",
         "items": [
             "Copies circle independently",
             "Begins to draw a person with head and limbs (2–4 parts)",
@@ -61,9 +61,8 @@ motorin_items = [
             "Tripod grasp emerges when coloring"
         ]
     },
-    {
-        "age_range": "3-4 Years",
-        "color": "orange",
+    "3–4 Years": {
+        "color": "#ffa07a",
         "items": [
             "Copies cross",
             "Cuts across a piece of paper with scissors",
@@ -72,9 +71,8 @@ motorin_items = [
             "Begins drawing a square"
         ]
     },
-    {
-        "age_range": "4-5 Years",
-        "color": "light blue",
+    "4–5 Years": {
+        "color": "#add8e6",
         "items": [
             "Copies square",
             "Begins drawing triangle",
@@ -83,9 +81,8 @@ motorin_items = [
             "Dresses self with supervision (zippers/buttons)"
         ]
     },
-    {
-        "age_range": "5-6 Years",
-        "color": "orange",
+    "5–6 Years": {
+        "color": "#ffa07a",
         "items": [
             "Copies triangle",
             "Begins copying diamond",
@@ -95,9 +92,8 @@ motorin_items = [
             "Buttons and unbuttons without help"
         ]
     },
-    {
-        "age_range": "6-7 Years",
-        "color": "light blue",
+    "6–7 Years": {
+        "color": "#add8e6",
         "items": [
             "Copies diamond",
             "Writes legibly within lines",
@@ -106,12 +102,10 @@ motorin_items = [
             "Demonstrates refined tripod grasp"
         ]
     }
-]
+}
 
-# Example usage
-if __name__ == "__main__":
-    for section in motorin_items:
-        print(f"Age: {section['age_range']} ({section['color']})")
-        for item in section['items']:
-            print(f"  - {item}")
-        print()
+# Render checkboxes by age bracket
+for age_group, data in age_brackets.items():
+    st.markdown(f"### <span style='color:{data['color']}'>{age_group}</span>", unsafe_allow_html=True)
+    for item in data["items"]:
+        st.checkbox(item, key=f"{age_group}_{item}")
