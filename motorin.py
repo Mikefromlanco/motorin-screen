@@ -3,7 +3,7 @@ import streamlit as st
 st.set_page_config(layout="wide")
 st.title("MOTORIN Fine Motor Screener")
 
-# Define screener items grouped by age
+# Test items grouped by age range
 screener_items = {
     "6–12 Months": [
         "Reaches with both hands",
@@ -25,43 +25,52 @@ screener_items = {
         "Builds tower of 4-6 blocks",
         "Places shape in puzzle board (circle/square/triangle)",
         "Turns knob or cap"
+    ],
+    "24–30 Months": [
+        "Imitates horizontal stroke",
+        "Strings 1-inch beads",
+        "Builds tower of 6+ blocks",
+        "Uses pronated or fingertip grasp when scribbling"
+    ],
+    "30–36 Months": [
+        "Imitates circle",
+        "Snips with scissors",
+        "Builds train of 3+ blocks",
+        "Turns pages one at a time",
+        "Completes simple inset puzzle"
+    ],
+    "3–4 Years": [
+        "Draws person with head and at least one body part",
+        "Imitates cross",
+        "Cuts across paper with scissors",
+        "Screws/unscrews lid",
+        "Holds crayon with tripod grasp"
+    ],
+    "4–5 Years": [
+        "Cuts on line",
+        "Draws square",
+        "Prints some capital letters",
+        "Buttons and unbuttons clothing",
+        "Copies first name"
+    ],
+    "5–6 Years": [
+        "Draws triangle",
+        "Ties shoelaces",
+        "Colors within lines",
+        "Cuts out circle",
+        "Prints numbers 1–5"
+    ],
+    "6–7 Years": [
+        "Forms all capital and lowercase letters",
+        "Uses appropriate spacing when writing",
+        "Uses functional grasp with pencil",
+        "Cuts complex shapes accurately",
+        "Writes full name"
     ]
 }
 
-# Custom spacing styles
-st.markdown("""
-    <style>
-    .stRadio > div {
-        flex-direction: row;
-        gap: 32px !important;
-        margin-top: -15px;
-    }
-    .stRadio label {
-        font-size: 16px;
-    }
-    .item-block {
-        margin-bottom: 35px;
-    }
-    hr {
-        margin-top: 50px;
-        margin-bottom: 50px;
-        border: 1px solid #ccc;
-    }
-    </style>
-""", unsafe_allow_html=True)
-
-# Display numbered items with improved spacing and dividers
-item_num = 1
-for idx, (age_group, items) in enumerate(screener_items.items()):
-    if idx > 0:
-        st.markdown("<hr>", unsafe_allow_html=True)
+# Display items
+for age_group, items in screener_items.items():
     st.header(age_group)
     for item in items:
-        st.markdown(f"<div class='item-block'><strong>{item_num}. {item}</strong></div>", unsafe_allow_html=True)
-        st.radio(
-            label="",
-            options=["Absent (0)", "Emerging (1)", "Present (2)"],
-            key=f"{item_num}_{item}",
-            horizontal=True
-        )
-        item_num += 1
+        st.radio(f"{item}", ["Absent (0)", "Emerging (1)", "Present (2)"], key=item)
