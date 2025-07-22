@@ -1,98 +1,127 @@
-**MOTORIN Screener Item List (Draft)**\
-*For use by Occupational Therapists via caregiver interview and/or direct child participation*
+import streamlit as st
+from io import BytesIO
+from docx import Document
+from fpdf import FPDF
+from datetime import date
 
----
+# Setup
+st.set_page_config(page_title="MOTORIN Screener", layout="wide")
+st.title("🧠 MOTORIN Fine Motor Screener")
 
-### Age 6-12 Months *(light blue)*
+# Child info
+child_name = st.text_input("Child's Name", placeholder="Enter name or initials")
+dob = st.date_input("Child's Date of Birth")
 
-- <span style="color:#007BFF">Reaches with both hands</span>
-- <span style="color:#007BFF">Transfers toy hand-to-hand</span>
-- <span style="color:#007BFF">Uses whole hand to rake small objects</span>
-- <span style="color:#007BFF">Bangs objects together</span>
-- <span style="color:#007BFF">Brings hands to midline</span>
-- <span style="color:#007BFF">Scribbles spontaneously when given a crayon *(scribble begins here)*</span>
-- <span style="color:#007BFF">Fisted grasp when holding a crayon *(add image: fisted grasp)*</span>
+# Calculate age
+today = date.today()
+age_years = age_months = None
+if dob:
+    age_years = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
+    age_months = (today.month - dob.month) % 12
+    st.markdown(f"**Chronological Age:** {age_years} years, {age_months} months")
 
----
+# Scoring
+options = ["Absent (0)", "Emerging (1)", "Present (2)"]
+score_map = {"Absent (0)": 0, "Emerging (1)": 1, "Present (2)": 2}
 
-### Age 12-18 Months *(orange)*
+motorin_data = {
+    "6–12 Months": {"color": "#add8e6", "items": [
+        "Reaches with both hands", "Transfers toy hand-to-hand", "Uses whole hand to rake small objects",
+        "Bangs objects together", "Brings hands to midline", "Scribbles spontaneously when given a crayon",
+        "Fisted grasp when holding a crayon"]},
+    "12–18 Months": {"color": "#ffa07a", "items": [
+        "Points with index finger", "Releases small object into container voluntarily", "Stacks 2-3 blocks",
+        "Turns pages in a cardboard book", "Uses a spoon with spills", "Pulls lids off containers",
+        "Digital pronate grasp when coloring"]},
+    "18–24 Months": {"color": "#add8e6", "items": [
+        "Imitates vertical stroke with crayon", "Places small objects into a container", "Builds a 4-block tower",
+        "Opens Ziplock bags"]},
+    "24–30 Months": {"color": "#ffa07a", "items": [
+        "Imitates horizontal stroke", "Turns single pages in board books", "Unscrews lids from containers",
+        "Snips with child-safe scissors", "Scribbles within large shapes without crossing boundaries",
+        "Attempts to copy a circle", "Uses fingertip grasp when coloring"]},
+    "30–36 Months": {"color": "#add8e6", "items": [
+        "Copies circle independently", "Begins to draw a person with head and limbs (2-4 parts)",
+        "Builds 6-8 block tower", "Uses spoon and fork with moderate spill", "Tripod grasp emerges when coloring"]},
+    "3–4 Years": {"color": "#ffa07a", "items": [
+        "Copies cross", "Cuts across a piece of paper with scissors", "Strings large beads",
+        "Buttons large buttons", "Begins drawing a square"]},
+    "4–5 Years": {"color": "#add8e6", "items": [
+        "Copies square", "Begins drawing triangle", "Cuts on a line with scissors",
+        "Writes some letters in their name", "Dresses self with supervision"]},
+    "5–6 Years": {"color": "#ffa07a", "items": [
+        "Copies triangle", "Begins copying diamond", "Draws person with 6+ parts",
+        "Prints first and last name", "Ties shoelaces (attempts)", "Buttons and unbuttons without help"]},
+    "6–7 Years": {"color": "#add8e6", "items": [
+        "Copies diamond", "Writes legibly within lines", "Cuts out complex shapes accurately",
+        "Ties shoelaces independently", "Demonstrates refined tripod grasp"]}
+}
 
-- <span style="color:#FF7F50">Points with index finger</span>
-- <span style="color:#FF7F50">Releases small object into container voluntarily</span>
-- <span style="color:#FF7F50">Stacks 2-3 blocks</span>
-- <span style="color:#FF7F50">Turns pages in a cardboard book</span>
-- <span style="color:#FF7F50">Uses a spoon with spills</span>
-- <span style="color:#FF7F50">Pulls lids off containers (e.g., Play-Doh, Tupperware)</span>
-- <span style="color:#FF7F50">Digital pronate grasp when coloring *(add image: digital pronate grasp)*</span>
+scores = {}
+flagged_items = []
 
----
+# Scoring UI
+for age_group, data in motorin_data.items():
+    st.markdown(f"### <span style='color:{data['color']}'>{age_group}</span>", unsafe_allow_html=True)
+    for item in data['items']:
+        col1, col2, col3 = st.columns([4, 3, 3])
+        with col1:
+            st.markdown(f"<span style='color:{data['color']}'>{item}</span>", unsafe_allow_html=True)
+        with col2:
+            response = st.radio("", options, key=f"{age_group}_{item}", horizontal=True, label_visibility="collapsed")
+        scores[f"{age_group}: {item}"] = score_map[response]
+        if score_map[response] == 0:
+            flagged_items.append(f"{item} ({age_group})")
 
-### Age 18-24 Months *(light blue)*
+# Report
+if st.button("Generate Report"):
+    total_score = sum(scores.values())
+    doc = Document()
+    doc.add_heading("MOTORIN Screener Report", 0)
+    doc.add_paragraph(f"Name: {child_name}")
+    if age_years is not None:
+        doc.add_paragraph(f"Chronological Age: {age_years} years, {age_months} months")
+    doc.add_paragraph(f"Total Score: {total_score}")
+    if flagged_items:
+        doc.add_paragraph("\n⚠️ Items flagged for review:")
+        for flag in flagged_items:
+            doc.add_paragraph(f"- {flag}")
 
-- <span style="color:#007BFF">Imitates vertical stroke with crayon *(pre-writing begins here)*</span>
-- <span style="color:#007BFF">Places small objects into a container</span>
-- <span style="color:#007BFF">Builds a 4-block tower</span>
-- <span style="color:#007BFF">Opens Ziplock bags</span>
+    for age_group in motorin_data:
+        doc.add_heading(age_group, level=1)
+        for item in motorin_data[age_group]['items']:
+            key = f"{age_group}: {item}"
+            val = scores[key]
+            doc.add_paragraph(f"{item}: {val} ({[k for k,v in score_map.items() if v == val][0]})")
 
----
+    word_stream = BytesIO()
+    doc.save(word_stream)
+    st.download_button("Download Word Report", word_stream.getvalue(), file_name="motorin_report.docx")
 
-### Age 24-30 Months *(orange)*
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
+    pdf.multi_cell(0, 10, txt="MOTORIN Screener Report\n\n")
+    pdf.multi_cell(0, 10, txt=f"Name: {child_name}")
+    if age_years is not None:
+        pdf.multi_cell(0, 10, txt=f"Chronological Age: {age_years} years, {age_months} months")
+    pdf.multi_cell(0, 10, txt=f"Total Score: {total_score}\n")
+    if flagged_items:
+        pdf.multi_cell(0, 10, txt="\nItems flagged for review:")
+        for flag in flagged_items:
+            clean_flag = flag.encode('latin-1', 'replace').decode('latin-1')
+            pdf.multi_cell(0, 10, txt=f"- {clean_flag}")
+    for age_group in motorin_data:
+        pdf.set_font("Arial", style='B', size=12)
+        pdf.cell(0, 10, txt=age_group.encode('latin-1', 'replace').decode('latin-1'), ln=True)
+        pdf.set_font("Arial", size=12)
+        for item in motorin_data[age_group]['items']:
+            key = f"{age_group}: {item}"
+            val = scores[key]
+            label = [k for k,v in score_map.items() if v == val][0]
+            clean_item = item.encode('latin-1', 'replace').decode('latin-1')
+            pdf.multi_cell(0, 10, txt=f"{clean_item}: {val} ({label})")
 
-- <span style="color:#FF7F50">Imitates horizontal stroke</span>
-- <span style="color:#FF7F50">Turns single pages in board books</span>
-- <span style="color:#FF7F50">Unscrews lids from containers</span>
-- <span style="color:#FF7F50">Snips with child-safe scissors</span>
-- <span style="color:#FF7F50">Scribbles within large shapes without crossing boundaries</span>
-- <span style="color:#FF7F50">Attempts to copy a circle</span>
-- <span style="color:#FF7F50">Uses fingertip grasp when coloring *(add image: fingertip grasp)*</span>
-
----
-
-### Age 30-36 Months *(light blue)*
-
-- <span style="color:#007BFF">Copies circle independently</span>
-- <span style="color:#007BFF">Begins to draw a person with head and limbs (2-4 parts)</span>
-- <span style="color:#007BFF">Builds 6-8 block tower</span>
-- <span style="color:#007BFF">Uses spoon and fork with moderate spill</span>
-- <span style="color:#007BFF">Tripod grasp emerges when coloring *(add image: tripod grasp)*</span>
-
----
-
-### Age 3-4 Years *(orange)*
-
-- <span style="color:#FF7F50">Copies cross</span>
-- <span style="color:#FF7F50">Cuts across a piece of paper with scissors</span>
-- <span style="color:#FF7F50">Strings large beads</span>
-- <span style="color:#FF7F50">Buttons large buttons</span>
-- <span style="color:#FF7F50">Begins drawing a square</span>
-
----
-
-### Age 4-5 Years *(light blue)*
-
-- <span style="color:#007BFF">Copies square</span>
-- <span style="color:#007BFF">Begins drawing triangle</span>
-- <span style="color:#007BFF">Cuts on a line with scissors</span>
-- <span style="color:#007BFF">Writes some letters in their name</span>
-- <span style="color:#007BFF">Dresses self with supervision (zippers/buttons)</span>
-
----
-
-### Age 5-6 Years *(orange)*
-
-- <span style="color:#FF7F50">Copies triangle</span>
-- <span style="color:#FF7F50">Begins copying diamond</span>
-- <span style="color:#FF7F50">Draws person with 6+ parts</span>
-- <span style="color:#FF7F50">Prints first and last name</span>
-- <span style="color:#FF7F50">Ties shoelaces (attempts)</span>
-- <span style="color:#FF7F50">Buttons and unbuttons without help</span>
-
----
-
-### Age 6-7 Years *(light blue)*
-
-- <span style="color:#007BFF">Copies diamond</span>
-- <span style="color:#007BFF">Writes legibly within lines</span>
-- <span style="color:#007BFF">Cuts out complex shapes accurately</span>
-- <span style="color:#007BFF">Ties shoelaces independently</span>
-- <span style="color:#007BFF">Demonstrates refined tripod grasp</span>
+    pdf_stream = BytesIO()
+    pdf.output(pdf_stream)
+    st.download_button("Download PDF Report", pdf_stream.getvalue(), file_name="motorin_report.pdf")
