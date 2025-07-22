@@ -3,7 +3,7 @@
 
 ---
 
-### Age 6–12 Months *(light blue)*
+### Age 6-12 Months *(light blue)*
 
 - Reaches with both hands
 - Transfers toy hand-to-hand
@@ -13,24 +13,24 @@
 - Scribbles spontaneously when given a crayon *(scribble begins here)*
 - Fisted grasp when holding a crayon *(add image: fisted grasp)*
 
-### Age 12–18 Months *(orange)*
+### Age 12-18 Months *(orange)*
 
 - Points with index finger
 - Releases small object into container voluntarily
-- Stacks 2–3 blocks
+- Stacks 2-3 blocks
 - Turns pages in a cardboard book
 - Uses a spoon with spills
 - Pulls lids off containers (e.g., Play-Doh, Tupperware)
 - Digital pronate grasp when coloring *(add image: digital pronate grasp)*
 
-### Age 18–24 Months *(light blue)*
+### Age 18-24 Months *(light blue)*
 
 - Imitates vertical stroke with crayon *(pre-writing begins here)*
 - Places small objects into a container
 - Builds a 4-block tower
 - Opens Ziplock bags
 
-### Age 24–30 Months *(orange)*
+### Age 24-30 Months *(orange)*
 
 - Imitates horizontal stroke
 - Turns single pages in board books
@@ -40,15 +40,15 @@
 - Attempts to copy a circle
 - Uses fingertip grasp when coloring *(add image: fingertip grasp)*
 
-### Age 30–36 Months *(light blue)*
+### Age 30-36 Months *(light blue)*
 
 - Copies circle independently
-- Begins to draw a person with head and limbs (2–4 parts)
-- Builds 6–8 block tower
+- Begins to draw a person with head and limbs (2-4 parts)
+- Builds 6-8 block tower
 - Uses spoon and fork with moderate spill
 - Tripod grasp emerges when coloring *(add image: tripod grasp)*
 
-### Age 3–4 Years *(orange)*
+### Age 3-4 Years *(orange)*
 
 - Copies cross
 - Cuts across a piece of paper with scissors
@@ -56,7 +56,7 @@
 - Buttons large buttons
 - Begins drawing a square
 
-### Age 4–5 Years *(light blue)*
+### Age 4-5 Years *(light blue)*
 
 - Copies square
 - Begins drawing triangle
@@ -64,7 +64,7 @@
 - Writes some letters in their name
 - Dresses self with supervision (zippers/buttons)
 
-### Age 5–6 Years *(orange)*
+### Age 5-6 Years *(orange)*
 
 - Copies triangle
 - Begins copying diamond
@@ -73,7 +73,7 @@
 - Ties shoelaces (attempts)
 - Buttons and unbuttons without help
 
-### Age 6–7 Years *(light blue)*
+### Age 6-7 Years *(light blue)*
 
 - Copies diamond
 - Writes legibly within lines
@@ -105,7 +105,6 @@ A written summary report will be auto-generated, incorporating:
 - Recommendations
 
 Users will have the ability to **download results as a PDF or Word document**.
-
 
 ---
 
