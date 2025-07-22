@@ -1,36 +1,8 @@
 import streamlit as st
 
-st.set_page_config(layout="wide")
+st.title("MOTORIN Fine Motor Screener")
 
-# Custom CSS for styling
-st.markdown("""
-    <style>
-        .big-header {
-            font-size: 40px;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .section {
-            border: 2px solid #ddd;
-            border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 40px;
-            background-color: #f9f9f9;
-        }
-        .item-label {
-            font-size: 20px;
-            font-weight: 500;
-            margin-top: 15px;
-        }
-    </style>
-""", unsafe_allow_html=True)
-
-# App Header
-st.markdown('<div class="big-header">🧠 MOTORIN Fine Motor Screener</div>', unsafe_allow_html=True)
-st.write("")
-
-# Define test items by age group
+# Test items grouped by age
 screener_items = {
     "6–12 Months": [
         "Reaches with both hands",
@@ -55,12 +27,8 @@ screener_items = {
     ]
 }
 
-# Render each section
-for age_range, items in screener_items.items():
-    with st.container():
-        st.markdown('<div class="section">', unsafe_allow_html=True)
-        st.subheader(age_range)
-        for item in items:
-            st.markdown(f'<div class="item-label">{item}</div>', unsafe_allow_html=True)
-            st.radio(f"{item}", ["Absent (0)", "Emerging (1)", "Present (2)"], key=item)
-        st.markdown('</div>', unsafe_allow_html=True)
+# Display items
+for age_group, items in screener_items.items():
+    st.header(age_group)
+    for item in items:
+        st.radio(f"{item}", ["Absent (0)", "Emerging (1)", "Present (2)"], key=item)
