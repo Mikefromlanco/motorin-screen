@@ -12,7 +12,7 @@ st.title("🧠 MOTORIN Fine Motor Screener")
 # Child and therapist info
 child_name = st.text_input("Child's Name", placeholder="Enter name or initials")
 
-dob = st.date_input("Child's Date of Birth", value=date.today()).year + 1)), index=20)
+dob = st.date_input("Child's Date of Birth", value=date.today())
 
 age = relativedelta(date.today(), dob)
 age_years = age.years
