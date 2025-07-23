@@ -4,12 +4,13 @@ from dateutil.relativedelta import relativedelta
 
 # Page setup
 
+st.set_page_config(page_title="MOTORIN Screener")
+st.markdown("<h1 style='text-align: center;'>🧠 MOTORIN Fine Motor Screener</h1>", unsafe_allow_html=True)
+
 
 first_name = st.text_input("Child's First Name")
 last_name = st.text_input("Child's Last Name")
 therapist_name = st.text_input("Therapist's Name")
-st.set_page_config(page_title="MOTORIN Screener")
-st.markdown("<h1 style='text-align: center;'>🧠 MOTORIN Fine Motor Screener</h1>", unsafe_allow_html=True)
 
 # Child DOB and Chronological Age Calculation
 dob = st.date_input("Child's Date of Birth", value=date.today())
