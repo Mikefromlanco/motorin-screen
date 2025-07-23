@@ -5,7 +5,7 @@ from dateutil.relativedelta import relativedelta
 # Page setup
 
 st.set_page_config(page_title="MOTORIN Screener")
-st.markdown("<h1 style='text-align: center;'>🧠 MOTORIN Fine Motor Screener</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center;'>🧵 MOTORIN Fine Motor Screener</h1>", unsafe_allow_html=True)
 
 
 first_name = st.text_input("Child's First Name")
