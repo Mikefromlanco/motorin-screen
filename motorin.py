@@ -1,6 +1,10 @@
 import streamlit as st
 
-st.markdown("<div style='text-align: center;'><img src='https://i.imgur.com/yDtdR8y.png' width='120'></div>", unsafe_allow_html=True)
+st.markdown("""
+<div style='text-align: center;'>
+    <img src='https://i.imgur.com/yDtdR8y.png' style='width: 30%; max-width: 350px; height: auto;'>
+</div>
+""", unsafe_allow_html=True)
 
 # Define age groups and items
 screener_items = {
