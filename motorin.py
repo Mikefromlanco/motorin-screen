@@ -1,10 +1,25 @@
 import streamlit as st
+from datetime import date
+from dateutil.relativedelta import relativedelta
 
 st.markdown("""
 <div style='text-align: center;'>
     <img src='https://i.imgur.com/yDtdR8y.png' style='width: 30%; max-width: 350px; height: auto;'>
 </div>
 """, unsafe_allow_html=True)
+
+# Child and therapist info
+child_fn = st.text_input("Child's First Name")
+child_ln = st.text_input("Child's Last Name")
+screen_date = st.date_input("Date of Screen")
+dob = st.date_input("Child's Date of Birth")
+therapist_name = st.text_input("Therapist's Name")
+
+# Calculate chronological age
+if dob:
+    today = date.today()
+    age = relativedelta(today, dob)
+    st.markdown(f"**Chronological Age:** {age.years} years, {age.months} months")
 
 # Define age groups and items
 screener_items = {
@@ -79,7 +94,23 @@ screener_items = {
     ]
 }
 
-# Display the screener items
+# Display demographics and screener items
+st.markdown("""
+---
+### Screening Details
+**Child's First Name:** {}
+
+**Child's Last Name:** {}
+
+**Date of Birth:** {}
+
+**Chronological Age:** {} years, {} months
+
+**Therapist Name:** {}
+
+**Date of Screen:** {}
+---
+""".format(child_fn, child_ln, dob.strftime('%m/%d/%Y'), age.years if dob else '', age.months if dob else '', therapist_name, screen_date.strftime('%m/%d/%Y')))
 for age_group, items in screener_items.items():
     st.markdown(f"### {age_group}")
     for item in items:
