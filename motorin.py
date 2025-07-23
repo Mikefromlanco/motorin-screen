@@ -1,100 +1,65 @@
 import streamlit as st
+from datetime import date
+from dateutil.relativedelta import relativedelta
 
-st.set_page_config(layout="wide")
-st.title("MOTORIN Fine Motor Screener")
+# Page setup
+st.set_page_config(page_title="MOTORIN Screener")
+st.title("🧠 MOTORIN Fine Motor Screener")
 
-# Inject CSS to control spacing and font
-st.markdown("""
-    <style>
-    .stRadio > div {
-        flex-direction: row;
-        gap: 24px !important;
-        margin-top: -8px !important;
-        margin-bottom: -4px !important;
-    }
-    [data-testid="stRadio"] {
-        margin-bottom: 10px !important;
-    }
-    </style>
-""", unsafe_allow_html=True)
+# Child DOB and Chronological Age Calculation
+dob = st.date_input("Child's Date of Birth", value=date.today())
+age = relativedelta(date.today(), dob)
+st.markdown(f"**Chronological Age:** {age.years} years, {age.months} months")
 
-# Define items grouped by age
-screener_items = {
+# Scoring setup
+options = ["Absent (0)", "Emerging (1)", "Present (2)"]
+score_map = {"Absent (0)": 0, "Emerging (1)": 1, "Present (2)": 2}
+
+# Motorin data (test items only)
+motorin_data = {
     "6–12 Months": [
-        "Reaches with both hands",
-        "Transfers toy hand-to-hand",
-        "Uses whole hand to rake small objects",
-        "Bangs objects together",
-        "Brings hands to midline",
-        "Scribbles spontaneously when given a crayon",
+        "Reaches with both hands", "Transfers toy hand-to-hand", "Uses whole hand to rake small objects",
+        "Bangs objects together", "Brings hands to midline", "Scribbles spontaneously when given a crayon",
         "Fisted grasp when holding a crayon"
     ],
     "12–18 Months": [
-        "Points with index finger",
-        "Releases small object into container voluntarily",
-        "Stacks 2-3 blocks",
-        "Turns pages in a cardboard book"
+        "Points with index finger", "Releases small object into container voluntarily", "Stacks 2–3 blocks",
+        "Turns pages in a cardboard book", "Uses a spoon with spills", "Pulls lids off containers",
+        "Digital pronate grasp when coloring"
     ],
     "18–24 Months": [
-        "Imitates vertical stroke",
-        "Builds tower of 4-6 blocks",
-        "Places shape in puzzle board (circle/square/triangle)",
-        "Turns knob or cap"
+        "Imitates vertical stroke with crayon", "Places small objects into a container", "Builds a 4-block tower",
+        "Opens Ziplock bags"
     ],
     "24–30 Months": [
-        "Imitates horizontal stroke",
-        "Strings 1-inch beads",
-        "Builds tower of 6+ blocks",
-        "Uses pronated or fingertip grasp when scribbling"
+        "Imitates horizontal stroke", "Turns single pages in board books", "Unscrews lids from containers",
+        "Snips with child-safe scissors", "Scribbles within large shapes without crossing boundaries",
+        "Attempts to copy a circle", "Uses fingertip grasp when coloring"
     ],
     "30–36 Months": [
-        "Imitates circle",
-        "Snips with scissors",
-        "Builds train of 3+ blocks",
-        "Turns pages one at a time",
-        "Completes simple inset puzzle"
+        "Copies circle independently", "Begins to draw a person with head and limbs (2–4 parts)",
+        "Builds 6–8 block tower", "Uses spoon and fork with moderate spill", "Tripod grasp emerges when coloring"
     ],
     "3–4 Years": [
-        "Draws person with head and at least one body part",
-        "Imitates cross",
-        "Cuts across paper with scissors",
-        "Screws/unscrews lid",
-        "Holds crayon with tripod grasp"
+        "Copies cross", "Cuts across a piece of paper with scissors", "Strings large beads",
+        "Buttons large buttons", "Begins drawing a square"
     ],
     "4–5 Years": [
-        "Cuts on line",
-        "Draws square",
-        "Prints some capital letters",
-        "Buttons and unbuttons clothing",
-        "Copies first name"
+        "Copies square", "Begins drawing triangle", "Cuts on a line with scissors",
+        "Writes some letters in their name", "Dresses self with supervision"
     ],
     "5–6 Years": [
-        "Draws triangle",
-        "Ties shoelaces",
-        "Colors within lines",
-        "Cuts out circle",
-        "Prints numbers 1–5"
+        "Copies triangle", "Begins copying diamond", "Draws person with 6+ parts",
+        "Prints first and last name", "Ties shoelaces (attempts)", "Buttons and unbuttons without help"
     ],
     "6–7 Years": [
-        "Forms all capital and lowercase letters",
-        "Uses appropriate spacing when writing",
-        "Uses functional grasp with pencil",
-        "Cuts complex shapes accurately",
-        "Writes full name"
+        "Copies diamond", "Writes legibly within lines", "Cuts out complex shapes accurately",
+        "Ties shoelaces independently", "Demonstrates refined tripod grasp"
     ]
 }
 
-# Display items in compact format
-item_num = 1
-for idx, (age_group, items) in enumerate(screener_items.items()):
-    if idx > 0:
-        st.markdown("<hr>", unsafe_allow_html=True)
-    st.header(age_group)
+# Render items
+for age_group, items in motorin_data.items():
+    st.markdown(f"---\n### {age_group}")
     for item in items:
-        st.radio(
-            label=f"**{item_num}. {item}**",
-            options=["Absent (0)", "Emerging (1)", "Present (2)"],
-            key=f"{item_num}_{item}",
-            horizontal=True
-        )
-        item_num += 1
+        response = st.radio(f"{item}", options, horizontal=True, key=f"{age_group}_{item}")
