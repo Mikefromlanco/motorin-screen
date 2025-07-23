@@ -3,8 +3,8 @@ from datetime import datetime
 
 st.set_page_config(page_title="Motorin Screener", layout="centered")
 
-# ---- TITLE ----
-st.markdown("<h1 style='text-align: center;'>🧠 MOTORIN Fine Motor Screener</h1>", unsafe_allow_html=True)
+# ---- LOGO ONLY (ENLARGED AND CENTERED) ----
+st.markdown("<div style='text-align: center;'><img src='https://i.imgur.com/4ERkpwm.png' width='480'></div>", unsafe_allow_html=True)
 st.markdown("---")
 
 # ---- DEMOGRAPHICS ----
