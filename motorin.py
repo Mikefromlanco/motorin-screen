@@ -3,6 +3,9 @@ from datetime import date
 from dateutil.relativedelta import relativedelta
 
 # Page setup
+first_name = st.text_input("Child's First Name")
+last_name = st.text_input("Child's Last Name")
+therapist_name = st.text_input("Therapist's Name")
 st.set_page_config(page_title="MOTORIN Screener")
 st.title("🧠 MOTORIN Fine Motor Screener")
 
@@ -34,10 +37,10 @@ motorin_data = {
     "24–30 Months": [
         "Imitates horizontal stroke", "Turns single pages in board books", "Unscrews lids from containers",
         "Snips with child-safe scissors", "Scribbles within large shapes without crossing boundaries",
-        "Attempts to copy a circle", "Uses fingertip grasp when coloring"
+        "Makes approximations of circles (endpoints overlap, looks more like an oval/circular scribble)", "Uses fingertip grasp when coloring"
     ],
     "30–36 Months": [
-        "Copies circle independently", "Begins to draw a person with head and limbs (2–4 parts)",
+        "Copies circle independently", "Draws a person with limbs and facial features (5 plus parts)",
         "Builds 6–8 block tower", "Uses spoon and fork with moderate spill", "Tripod grasp emerges when coloring"
     ],
     "3–4 Years": [
