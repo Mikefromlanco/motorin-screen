@@ -94,8 +94,24 @@ for age_range, items in items_by_age.items():
     st.markdown(f"<hr><h4>{age_range}</h4>", unsafe_allow_html=True)
     for item in items:
         score = st.radio(f"{item_number}. {item}", list(score_options.keys()), horizontal=True, key=f"item_{item_number}")
-        scores[f"{item_number}. {item}"] = score_options[score]
+        scores[f"{age_range} - {item_number}. {item}"] = score_options[score]
         item_number += 1
 
 st.markdown("---")
-st.success("✅ Screening complete! Scroll up to review or edit responses.")
+
+# ---- AGE EQUIVALENCY CALCULATION ----
+st.header("Summary & Age Equivalency")
+
+age_midpoints = {
+    "1–2 Years": 18,
+    "2–3 Years": 30,
+    "3–4 Years": 42,
+    "4–5 Years": 54,
+    "5–6 Years": 66,
+    "6–7 Years": 78
+}
+
+total_points = 0
+valid_items = 0
+
+f
