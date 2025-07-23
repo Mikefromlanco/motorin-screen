@@ -95,22 +95,7 @@ screener_items = {
 }
 
 # Display demographics and screener items
-st.markdown("""
----
-### Screening Details
-**Child's First Name:** {}
-
-**Child's Last Name:** {}
-
-**Date of Birth:** {}
-
-**Chronological Age:** {} years, {} months
-
-**Therapist Name:** {}
-
-**Date of Screen:** {}
----
-""".format(child_fn, child_ln, dob.strftime('%m/%d/%Y'), age.years if dob else '', age.months if dob else '', therapist_name, screen_date.strftime('%m/%d/%Y')))
+)
 for age_group, items in screener_items.items():
     st.markdown(f"### {age_group}")
     for item in items:
