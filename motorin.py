@@ -175,8 +175,7 @@ if st.button("Submit"):
     pdf = FPDF()
 pdf.add_page()
 pdf.set_font("Arial", size=12)
-for line in summary.strip().split("
-"):
+for line in summary.strip().split(" "):
     pdf.multi_cell(0, 10, line)
 pdf_filename = f"motorin_summary_{child_first_name}_{child_last_name}.pdf"
 pdf.output(pdf_filename)
