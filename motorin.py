@@ -150,3 +150,39 @@ if st.button("Submit"):
     passed = sum(1 for r in responses.values() if r == "Present")
     total = len(responses)
     st.write(f"Items marked 'Present': {passed} / {total}")
+
+    # Generate paragraph summary for families
+    summary = f"""
+    Based on today's screening using the MOTORIN tool, {child_first_name} {child_last_name} demonstrated {passed} of {total} fine motor skills as developmentally present. These observed skills include a variety of age-appropriate abilities such as grasping, drawing, manipulating objects, and imitating motor patterns. 
+
+    This information provides a helpful snapshot of {child_first_name}'s current strengths and emerging abilities. It can be used to support goal planning, therapy recommendations, or simply to inform caregivers of developmental progress. Continued observation and practice of fine motor tasks at home can encourage skill development.
+    """
+
+    st.markdown("---")
+    st.subheader("Family-Friendly Summary")
+    st.markdown(summary)
+
+    # Save to Word and PDF
+    from docx import Document
+    from fpdf import FPDF
+
+    doc = Document()
+    doc.add_heading("MOTORIN Family Summary", level=1)
+    doc.add_paragraph(summary.strip())
+    word_filename = f"motorin_summary_{child_first_name}_{child_last_name}.docx"
+    doc.save(word_filename)
+
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
+    for line in summary.strip().split("
+"):
+        pdf.multi_cell(0, 10, line)
+    pdf_filename = f"motorin_summary_{child_first_name}_{child_last_name}.pdf"
+    pdf.output(pdf_filename)
+
+    with open(word_filename, "rb") as f:
+        st.download_button("Download Word Summary", f, file_name=word_filename)
+
+    with open(pdf_filename, "rb") as f:
+        st.download_button("Download PDF Summary", f, file_name=pdf_filename)
