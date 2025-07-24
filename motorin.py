@@ -101,11 +101,21 @@ motorin_items = {
 
 st.title("MOTORIN Screener")
 
+# Display today's date next to child's first name
+col1, col2 = st.columns([2, 1])
+with col1:
+    with col2:
+    st.markdown(f"**Today’s Date:** {date.today().strftime('%B %d, %Y')}", unsafe_allow_html=True)
+
 child_name = st.text_input("Child's First Name")
+child_last_name = st.text_input("Child's Last Name")
+therapist_name = st.text_input("Therapist Name")
 dob = st.date_input("Date of Birth")
 today = date.today()
 age_months = (today.year - dob.year) * 12 + today.month - dob.month
-st.write(f"Chronological Age: {age_months} months")
+age_years = age_months // 12
+age_remaining_months = age_months % 12
+st.write(f"Chronological Age: {age_months} months ({age_years} Y, {age_remaining_months} M)")
 
 responses = {}
 
