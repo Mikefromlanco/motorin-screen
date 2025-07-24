@@ -104,8 +104,7 @@ st.title("MOTORIN Screener")
 # Display today's date next to child's first name
 col1, col2 = st.columns([2, 1])
 with col1:
-    child_name = st.text_input("Child's First Name")
-with col2:
+    with col2:
     st.markdown(f"**Today’s Date:** {date.today().strftime('%B %d, %Y')}", unsafe_allow_html=True)
 
 child_name = st.text_input("Child's First Name")
