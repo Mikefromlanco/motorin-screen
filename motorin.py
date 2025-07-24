@@ -1,150 +1,129 @@
 import streamlit as st
-from datetime import datetime
+from datetime import date
 
-st.set_page_config(page_title="Motorin Screener", layout="centered")
-
-# ---- LOGO (CENTERED AND ENLARGED) ----
-st.markdown("<div style='text-align: center;'><img src='https://i.imgur.com/1thkHWE.png' width='480'></div>", unsafe_allow_html=True)
-st.markdown("---")
-
-# ---- DEMOGRAPHICS ----
-st.header("Screening Details")
-child_first_name = st.text_input("Child's First Name")
-child_last_name = st.text_input("Child's Last Name")
-dob = st.date_input("Date of Birth")
-date_of_screen = st.date_input("Date of Screen", datetime.today())
-therapist_name = st.text_input("Therapist Name")
-
-# ---- CHRONOLOGICAL AGE CALCULATION ----
-if dob:
-    today = date_of_screen
-    delta = today - dob
-    years = delta.days // 365
-    months = (delta.days % 365) // 30
-    st.markdown(f"**Chronological Age:** {years} years, {months} months")
-
-st.markdown("---")
-
-# ---- SCREENER INSTRUCTIONS ----
-st.subheader("Instructions")
-st.markdown("Rate each item based on observation or parent/therapist report using the following scale:")
-st.markdown("- 0 = Absent")
-st.markdown("- 1 = Emerging")
-st.markdown("- 2 = Present")
-st.markdown("---")
-
-# ---- SCREENER ITEMS ----
-st.header("Screener Items")
-
-items_by_age = {
-    "1–2 Years": [
-        "Reaches for objects with one hand",
+# Updated MOTORIN screener item list (Birth to 7 Years)
+motorin_items = {
+    "0-3 Months": [
+        "Tracks rattle side to side",
+        "Brings hands to midline",
+        "Briefly brings hands to mouth",
+        "Grips caregiver's finger",
+        "Opens fingers during touch/play",
+        "Shows alertness to visual stimuli"
+    ],
+    "4-6 Months": [
+        "Reaches for toy with both hands",
+        "Holds a rattle briefly with one or both hands",
+        "Brings toy to mouth",
+        "Swipes at toy dangling in front of them",
+        "Maintains grasp when toy is gently pulled",
+        "Purposefully turns head to look at sounds"
+    ],
+    "7-9 Months": [
+        "Transfers toy between hands",
         "Bangs two toys together",
-        "Places items into a container",
-        "Removes items from container",
-        "Holds crayon and scribbles",
+        "Rakes small object with fingers",
+        "Grasps cube with radial-palmar grasp",
+        "Shakes toy purposefully",
+        "Reaches in different directions with control"
     ],
-    "2–3 Years": [
-        "Turns pages in a book",
-        "Builds a tower of 4+ blocks",
-        "Imitates vertical strokes",
-        "Strings large beads",
-        "Uses spoon with minimal spilling",
+    "10-12 Months": [
+        "Releases block into container",
+        "Uses a pincer grasp to pick up tiny objects",
+        "Opens hand to drop object without cue",
+        "Pokes with index finger",
+        "Takes rings off of a stacker"
     ],
-    "3–4 Years": [
-        "Copies a circle",
-        "Cuts paper in half with scissors",
-        "Buttons large buttons",
-        "Uses tripod grasp on crayon",
-        "Manipulates toys with moving parts",
+    "13-18 Months": [
+        "Turns pages in cardboard book (multiple at once)",
+        "Scribbles with crayon (full-arm motion)",
+        "Places 1 shape into shape sorter",
+        "Removes pegs from pegboard",
+        "Places toy in/out of container",
+        "Uses both hands in midline play",
+        "Puts 4 rings onto a stacker"
     ],
-    "4–5 Years": [
-        "Copies a cross",
-        "Cuts along a straight line",
-        "Traces basic shapes",
-        "Screws/unscrews lids",
-        "Uses fork independently",
+    "19-24 Months": [
+        "Builds tower of 4+ blocks",
+        "Places lid on container",
+        "Unscrews or pulls off container lid",
+        "Scribbles spontaneously (in all directions)",
+        "Places 3+ shapes in sorter",
+        "Inserts coin into slot",
+        "Takes apart pop beads",
+        "Imitates forming vertical strokes"
     ],
-    "5–6 Years": [
-        "Prints some capital letters",
-        "Cuts out a circle",
-        "Zips and unzips jacket",
-        "Uses pencil with controlled grasp",
-        "Completes simple dot-to-dot",
+    "25-36 Months (2-3 Years)": [
+        "Draws vertical stroke",
+        "Builds 6-block tower",
+        "Opens simple flip-top container",
+        "Strings 1–2 large beads",
+        "Imitates circular scribble",
+        "Begins to show hand preference",
+        "Puts together pop beads",
+        "Imitates forming horizontal strokes"
     ],
-    "6–7 Years": [
-        "Copies triangle",
-        "Colors within the lines",
-        "Buttons and unbuttons quickly",
-        "Builds complex block designs",
-        "Writes name clearly",
+    "37-48 Months (3-4 Years)": [
+        "Snips paper with child scissors",
+        "Imitates forming a circle",
+        "Strings 4–5 beads",
+        "Cuts across paper with moderate control",
+        "Builds 9–10 block tower",
+        "Screws lid onto container",
+        "Imitates forming a cross"
+    ],
+    "49-60 Months (4-5 Years)": [
+        "Imitates forming a square",
+        "Draws simple person (head + limbs)",
+        "Cuts on thick line with control",
+        "Colors inside simple shape (e.g., circle)",
+        "Uses mature tripod grasp (emerging)",
+        "Places clothespin onto object"
+    ],
+    "61-72 Months (5-6 Years)": [
+        "Imitates forming a triangle",
+        "Draws complete person (head, limbs, facial features)",
+        "Cuts simple shapes (circle, square)",
+        "Writes name or letters with legibility",
+        "Strings 3 small beads onto a string",
+        "Imitates and reproduces 3-step visual patterns",
+        "Opens food packages"
+    ],
+    "73-84 Months (6-7 Years)": [
+        "Copies diamond",
+        "Writes full name with legible spacing",
+        "Cuts out a square accurately",
+        "Writes short sentence",
+        "Folds paper in half with symmetry",
+        "Completes dot-to-dot picture with precision"
     ]
 }
 
-score_options = {
-    "Absent (0)": 0,
-    "Emerging (1)": 1,
-    "Present (2)": 2
-}
+st.title("MOTORIN Screener")
 
-item_number = 1
-scores = {}
+child_name = st.text_input("Child's First Name")
+dob = st.date_input("Date of Birth")
+today = date.today()
+age_months = (today.year - dob.year) * 12 + today.month - dob.month
+st.write(f"Chronological Age: {age_months} months")
 
-for age_range, items in items_by_age.items():
-    st.markdown(f"<hr><h4>{age_range}</h4>", unsafe_allow_html=True)
+responses = {}
+
+for band, items in motorin_items.items():
+    st.subheader(band)
     for item in items:
-        score = st.radio(f"{item_number}. {item}", list(score_options.keys()), horizontal=True, key=f"item_{item_number}")
-        scores[f"{age_range} - {item_number}. {item}"] = score_options[score]
-        item_number += 1
+        key = f"{band}_{item}"
+        response = st.radio(
+            label=item,
+            options=["Absent", "Emerging", "Present"],
+            key=key,
+            horizontal=True
+        )
+        responses[key] = response
 
-st.markdown("---")
-
-# ---- AGE EQUIVALENCY CALCULATION ----
-st.header("Summary & Age Equivalency")
-
-age_midpoints = {
-    "1–2 Years": 18,
-    "2–3 Years": 30,
-    "3–4 Years": 42,
-    "4–5 Years": 54,
-    "5–6 Years": 66,
-    "6–7 Years": 78
-}
-
-total_points = 0
-valid_items = 0
-
-for item_label, score in scores.items():
-    for age_range, midpoint in age_midpoints.items():
-        if age_range in item_label:
-            anchor_age = midpoint
-            break
-    else:
-        anchor_age = 0
-
-    if score == 1:
-        total_points += 0.5 * anchor_age
-        valid_items += 1
-    elif score == 2:
-        total_points += anchor_age
-        valid_items += 1
-
-if valid_items > 0:
-    avg_months = total_points / valid_items
-    ae_years = int(avg_months // 12)
-    ae_months = int(avg_months % 12)
-    st.subheader(f"🧠 Fine Motor Age Equivalency: {ae_years} years, {ae_months} months")
-
-    if dob:
-        ca_months = (date_of_screen - dob).days // 30
-        gap = ca_months - avg_months
-
-        if gap <= 0:
-            recommendation = "✅ Age-appropriate fine motor skills"
-        elif gap <= 6:
-            recommendation = "⚠️ Mild delay – Monitor"
-        else:
-            recommendation = "❌ Delay – Further evaluation recommended"
-        st.markdown(f"**Clinical Impression:** {recommendation}")
-else:
-    st.warning("Insufficient data to calculate age equivalency.")
+if st.button("Submit"):
+    st.success("Screening complete! Generating summary...")
+    # Summary logic can be expanded here
+    passed = sum(1 for r in responses.values() if r == "Present")
+    total = len(responses)
+    st.write(f"Items marked 'Present': {passed} / {total}")
