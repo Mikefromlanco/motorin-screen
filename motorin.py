@@ -175,13 +175,14 @@ if st.button("Submit"):
     pdf = FPDF()
 pdf.add_page()
 pdf.set_font("Arial", size=12)
-for line in summary.strip().split(" "):
+for line in summary.strip().split("
+"):
     pdf.multi_cell(0, 10, line)
 pdf_filename = f"motorin_summary_{child_first_name}_{child_last_name}.pdf"
 pdf.output(pdf_filename)
 
     with open(word_filename, "rb") as f:
-        st.download_button("Download Word Summary", f, file_name=word_filename)
+    st.download_button("Download Word Summary", f, file_name=word_filename)
 
     with open(pdf_filename, "rb") as f:
-        st.download_button("Download PDF Summary", f, file_name=pdf_filename)
+    st.download_button("Download PDF Summary", f, file_name=pdf_filename)
