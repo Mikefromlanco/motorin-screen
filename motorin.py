@@ -1,39 +1,7 @@
 import streamlit as st
-from datetime import datetime
+from datetime import date
 
-st.set_page_config(page_title="Motorin Screener", layout="centered")
-
-# ---- LOGO (CENTERED AND ENLARGED) ----
-st.markdown("<div style='text-align: center;'><img src='https://i.imgur.com/1thkHWE.png' width='480'></div>", unsafe_allow_html=True)
-st.markdown("---")
-
-# ---- DEMOGRAPHICS ----
-st.header("Screening Details")
-child_first_name = st.text_input("Child's First Name")
-child_last_name = st.text_input("Child's Last Name")
-dob = st.date_input("Date of Birth")
-date_of_screen = st.date_input("Date of Screen", datetime.today())
-therapist_name = st.text_input("Therapist Name")
-
-# ---- CHRONOLOGICAL AGE CALCULATION ----
-if dob:
-    today = date_of_screen
-    delta = today - dob
-    years = delta.days // 365
-    months = (delta.days % 365) // 30
-    st.markdown(f"**Chronological Age:** {years} years, {months} months")
-
-st.markdown("---")
-
-# ---- SCREENER INSTRUCTIONS ----
-st.subheader("Instructions")
-st.markdown("Rate each item based on observation or parent/therapist report using the following scale:")
-st.markdown("- 0 = Absent")
-st.markdown("- 1 = Emerging")
-st.markdown("- 2 = Present")
-st.markdown("---")
-
-# ---- MOTORIN SCREENER ITEMS ----
+# Updated MOTORIN screener item list (Birth to 7 Years)
 motorin_items = {
     "0-3 Months": [
         "Tracks rattle side to side",
@@ -131,6 +99,28 @@ motorin_items = {
     ]
 }
 
+st.title("MOTORIN Screener")
+
+# Child’s First Name (left) and Today’s Date (right)
+col1, col2 = st.columns([2, 1])
+with col1:
+    child_name = st.text_input("Child's First Name")
+with col2:
+    st.markdown(f"**Today’s Date:** {date.today().strftime('%B %d, %Y')}", unsafe_allow_html=True)
+
+# Additional info
+child_last_name = st.text_input("Child's Last Name")
+therapist_name = st.text_input("Therapist Name")
+dob = st.date_input("Date of Birth")
+today = date.today()
+
+# Chronological age in months (and Y/M format)
+age_months = (today.year - dob.year) * 12 + today.month - dob.month
+age_years = age_months // 12
+age_remaining_months = age_months % 12
+st.write(f"Chronological Age: {age_months} months ({age_years} Y, {age_remaining_months} M)")
+
+# Screener responses
 responses = {}
 
 for band, items in motorin_items.items():
@@ -150,39 +140,3 @@ if st.button("Submit"):
     passed = sum(1 for r in responses.values() if r == "Present")
     total = len(responses)
     st.write(f"Items marked 'Present': {passed} / {total}")
-
-    # Generate paragraph summary for families
-    summary = f"""
-    Based on today's screening using the MOTORIN tool, {child_first_name} {child_last_name} demonstrated {passed} of {total} fine motor skills as developmentally present. These observed skills include a variety of age-appropriate abilities such as grasping, drawing, manipulating objects, and imitating motor patterns. 
-
-    This information provides a helpful snapshot of {child_first_name}'s current strengths and emerging abilities. It can be used to support goal planning, therapy recommendations, or simply to inform caregivers of developmental progress. Continued observation and practice of fine motor tasks at home can encourage skill development.
-    """
-
-    st.markdown("---")
-    st.subheader("Family-Friendly Summary")
-    st.markdown(summary)
-
-    # Save to Word and PDF
-    from docx import Document
-    from fpdf import FPDF
-
-    doc = Document()
-    doc.add_heading("MOTORIN Family Summary", level=1)
-    doc.add_paragraph(summary.strip())
-    word_filename = f"motorin_summary_{child_first_name}_{child_last_name}.docx"
-    doc.save(word_filename)
-
-    pdf = FPDF()
-    pdf.add_page()
-    pdf.set_font("Arial", size=12)
-    for line in summary.strip().split("
-"):
-        pdf.multi_cell(0, 10, line)
-    pdf_filename = f"motorin_summary_{child_first_name}_{child_last_name}.pdf"
-    pdf.output(pdf_filename)
-
-        with open(word_filename, "rb") as f:
-        st.download_button("Download Word Summary", f, file_name=word_filename)
-
-        with open(pdf_filename, "rb") as f:
-        st.download_button("Download PDF Summary", f, file_name=pdf_filename)
