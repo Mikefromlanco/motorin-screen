@@ -99,7 +99,8 @@ motorin_items = {
     ]
 }
 
-st.title("MOTORIN Screener")
+st.markdown("<div style='text-align: center;'><img src='https://i.imgur.com/1thkHWE.png' width='480'></div>", unsafe_allow_html=True)
+st.markdown("---")
 
 # Child’s First Name (left) and Today’s Date (right)
 col1, col2 = st.columns([2, 1])
