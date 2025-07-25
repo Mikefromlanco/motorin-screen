@@ -102,7 +102,7 @@ motorin_items = {
 st.markdown("<div style='text-align: center;'><img src='https://i.imgur.com/1thkHWE.png' width='480'></div>", unsafe_allow_html=True)
 st.markdown("---")
 
-# Child’s First Name (left) and Today’s Date (right)
+# Child’s First Name (left) and Screen Date (right)
 col1, col2 = st.columns([2, 1])
 with col1:
     child_name = st.text_input("Child's First Name")
@@ -124,7 +124,8 @@ st.write(f"Chronological Age: {age_months} months ({age_years} Y, {age_remaining
 # Screener responses
 responses = {}
 
-for band, items in motorin_items.items():
+for band in sorted(motorin_items.keys(), key=lambda x: int(x.split('-')[0])):
+    items = motorin_items[band]
     st.subheader(band)
     for item in items:
         key = f"{band}_{item}"
@@ -140,16 +141,17 @@ if st.button("Submit"):
     st.success("Screening complete! Generating summary...")
     passed = sum(1 for r in responses.values() if r == "Present")
     total = len(responses)
-    st.write(f"Items marked 'Present': {passed} / {total}")
+    st.write(f"Percentage of Success Per Age Band: {passed} / {total}")
 
     # Calculate percentages per bracket
     bracket_results = {}
-    for band, items in motorin_items.items():
+    for band in sorted(motorin_items.keys(), key=lambda x: int(x.split('-')[0])):
+        items = motorin_items[band]
         present_count = sum(1 for item in items if responses.get(f"{band}_{item}") == "Present")
         percentage = round((present_count / len(items)) * 100)
         bracket_results[band] = percentage
 
     # Display chart
     st.markdown("---")
-    st.subheader("Summary by Age Band")
+    st.subheader("Percentage of Success Per Age Band")
     st.bar_chart(bracket_results)
