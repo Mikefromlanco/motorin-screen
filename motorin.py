@@ -107,13 +107,13 @@ col1, col2 = st.columns([2, 1])
 with col1:
     child_name = st.text_input("Child's First Name")
 with col2:
-    st.markdown(f"**Today’s Date:** {date.today().strftime('%B %d, %Y')}", unsafe_allow_html=True)
+    screen_date = st.date_input("Screen Date", value=date.today())
 
 # Additional info
 child_last_name = st.text_input("Child's Last Name")
 therapist_name = st.text_input("Therapist Name")
 dob = st.date_input("Date of Birth")
-today = date.today()
+today = screen_date
 
 # Chronological age in months (and Y/M format)
 age_months = (today.year - dob.year) * 12 + today.month - dob.month
