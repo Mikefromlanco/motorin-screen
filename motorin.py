@@ -1,4 +1,4 @@
-import streamlit as st
+import streamlit as s
 from datetime import date
 
 # Updated MOTORIN screener item list (Birth to 7 Years)
