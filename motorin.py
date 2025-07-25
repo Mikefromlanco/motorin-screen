@@ -141,3 +141,15 @@ if st.button("Submit"):
     passed = sum(1 for r in responses.values() if r == "Present")
     total = len(responses)
     st.write(f"Items marked 'Present': {passed} / {total}")
+
+    # Calculate percentages per bracket
+    bracket_results = {}
+    for band, items in motorin_items.items():
+        present_count = sum(1 for item in items if responses.get(f"{band}_{item}") == "Present")
+        percentage = round((present_count / len(items)) * 100)
+        bracket_results[band] = percentage
+
+    # Display chart
+    st.markdown("---")
+    st.subheader("Summary by Age Band")
+    st.bar_chart(bracket_results)
